@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using WorkforceHubAPI.Contracts;
 
 namespace WorkforceHubAPI.WebAPI.Controllers;
 
@@ -11,9 +12,9 @@ public class WeatherForecastController : ControllerBase
         "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
     };
 
-    private readonly ILogger<WeatherForecastController> _logger;
+    private readonly ILoggerManager _logger;
 
-    public WeatherForecastController(ILogger<WeatherForecastController> logger)
+    public WeatherForecastController(ILoggerManager logger)
     {
         _logger = logger;
     }
@@ -21,6 +22,8 @@ public class WeatherForecastController : ControllerBase
     [HttpGet(Name = "GetWeatherForecast")]
     public IEnumerable<WeatherForecast> Get()
     {
+        _logger.LogInfo("WeatherForecast GET method called");
+
         return Enumerable.Range(1, 5).Select(index => new WeatherForecast
         {
             Date = DateOnly.FromDateTime(DateTime.Now.AddDays(index)),

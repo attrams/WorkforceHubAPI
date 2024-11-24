@@ -5,6 +5,10 @@ VisualStudioVersion = 17.0.31903.59
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WorkforceHubAPI.WebAPI", "WorkforceHubAPI.WebAPI\WorkforceHubAPI.WebAPI.csproj", "{EC7E7D1C-E82A-4248-9722-82BEFF504CBD}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WorkforceHubAPI.Contracts", "WorkforceHubAPI.Contracts\WorkforceHubAPI.Contracts.csproj", "{A98BBD17-29F6-45D4-9E3E-E8B7F3C1B712}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WorkforceHubAPI.LoggerService", "WorkforceHubAPI.LoggerService\WorkforceHubAPI.LoggerService.csproj", "{145CBE68-6084-4BA8-BDBF-A7851D7BA875}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -18,5 +22,13 @@ Global
 		{EC7E7D1C-E82A-4248-9722-82BEFF504CBD}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{EC7E7D1C-E82A-4248-9722-82BEFF504CBD}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{EC7E7D1C-E82A-4248-9722-82BEFF504CBD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A98BBD17-29F6-45D4-9E3E-E8B7F3C1B712}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A98BBD17-29F6-45D4-9E3E-E8B7F3C1B712}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A98BBD17-29F6-45D4-9E3E-E8B7F3C1B712}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A98BBD17-29F6-45D4-9E3E-E8B7F3C1B712}.Release|Any CPU.Build.0 = Release|Any CPU
+		{145CBE68-6084-4BA8-BDBF-A7851D7BA875}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{145CBE68-6084-4BA8-BDBF-A7851D7BA875}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{145CBE68-6084-4BA8-BDBF-A7851D7BA875}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{145CBE68-6084-4BA8-BDBF-A7851D7BA875}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

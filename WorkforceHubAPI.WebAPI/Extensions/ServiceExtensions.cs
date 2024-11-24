@@ -1,3 +1,6 @@
+using WorkforceHubAPI.Contracts;
+using WorkforceHubAPI.LoggerService;
+
 namespace WorkforceHubAPI.WebAPI.Extensions;
 
 /// <summary>
@@ -36,4 +39,12 @@ public static class ServiceExtensions
                 .AllowAnyHeader()
         );
     });
+
+    /// <summary>
+    /// Configures and registers the logger service to the dependency injection container.
+    /// This method adds the <see cref="ILoggerManager"/> interface and binds it to the <see cref="LoggerManager"/> implementation.
+    /// The <see cref="LoggerManager"/> will be used throughout the application for logging purposes.
+    /// </summary>
+    /// <param name="services">The IServiceCollection to which the logger service will be added.</param>
+    public static void ConfigureLoggerService(this IServiceCollection services) => services.AddSingleton<ILoggerManager, LoggerManager>();
 }
