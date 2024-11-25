@@ -11,6 +11,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WorkforceHubAPI.LoggerServi
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WorkforceHubAPI.Entities", "WorkforceHubAPI.Entities\WorkforceHubAPI.Entities.csproj", "{28E1451D-1783-45FD-88FD-3BB3EF396E39}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WorkforceHubAPI.Repository", "WorkforceHubAPI.Repository\WorkforceHubAPI.Repository.csproj", "{7E664D09-D126-48D0-B04D-296985AAD784}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -36,5 +38,9 @@ Global
 		{28E1451D-1783-45FD-88FD-3BB3EF396E39}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{28E1451D-1783-45FD-88FD-3BB3EF396E39}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{28E1451D-1783-45FD-88FD-3BB3EF396E39}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7E664D09-D126-48D0-B04D-296985AAD784}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7E664D09-D126-48D0-B04D-296985AAD784}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7E664D09-D126-48D0-B04D-296985AAD784}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7E664D09-D126-48D0-B04D-296985AAD784}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
