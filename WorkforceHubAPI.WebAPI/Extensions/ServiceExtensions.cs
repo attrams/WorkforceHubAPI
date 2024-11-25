@@ -1,5 +1,6 @@
 using WorkforceHubAPI.Contracts;
 using WorkforceHubAPI.LoggerService;
+using WorkforceHubAPI.Repository;
 
 namespace WorkforceHubAPI.WebAPI.Extensions;
 
@@ -31,20 +32,29 @@ public static class ServiceExtensions
     /// app.UseCors("CorsPolicy")
     /// </code>
     /// </example>
-    public static void ConfigureCors(this IServiceCollection services) => services.AddCors(options =>
-    {
-        options.AddPolicy("CorsPolicy", builder =>
-            builder.AllowAnyOrigin()
-                .AllowAnyHeader()
-                .AllowAnyHeader()
-        );
-    });
+    public static void ConfigureCors(this IServiceCollection services) =>
+        services.AddCors(options =>
+        {
+            options.AddPolicy(
+                "CorsPolicy",
+                builder => builder.AllowAnyOrigin().AllowAnyHeader().AllowAnyHeader()
+            );
+        });
 
     /// <summary>
     /// Configures and registers the logger service to the dependency injection container.
     /// This method adds the <see cref="ILoggerManager"/> interface and binds it to the <see cref="LoggerManager"/> implementation.
     /// The <see cref="LoggerManager"/> will be used throughout the application for logging purposes.
     /// </summary>
-    /// <param name="services">The IServiceCollection to which the logger service will be added.</param>
-    public static void ConfigureLoggerService(this IServiceCollection services) => services.AddSingleton<ILoggerManager, LoggerManager>();
+    /// <param name="services">The <see cref="IServiceCollection"/> to which the logger service will be added.</param>
+    public static void ConfigureLoggerService(this IServiceCollection services) =>
+        services.AddSingleton<ILoggerManager, LoggerManager>();
+
+    /// <summary>
+    /// Configures the repository manager service for dependency injection.
+    /// Registers <see cref="RepositoryManager"/> as the implementation for <see cref="IRepositoryManager"/>.
+    /// </summary>
+    /// <param name="services">The <see cref="IServiceCollection"/> used for dependency injection.</param>
+    public static void ConfigureRepositoryManager(this IServiceCollection services) =>
+        services.AddScoped<IRepositoryManager, RepositoryManager>();
 }
