@@ -3,7 +3,6 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace WorkforceHubAPI.Entities.Models;
 
-
 /// <summary>
 /// Represents an employee entity in the application.
 /// </summary>
@@ -38,10 +37,10 @@ public class Employee
     /// Gets or sets the position of the employee within the company.
     /// </summary>
     /// <remarks>
-    /// This field is required and has a maximum length of 20 characters.
+    /// This field is required and has a maximum length of 40 characters.
     /// </remarks>
     [Required(ErrorMessage = "Position is a required field.")]
-    [MaxLength(20, ErrorMessage = "Maximum length for the position is 20")]
+    [MaxLength(40, ErrorMessage = "Maximum length for the position is 40")]
     public string? Position { get; set; }
 
     /// <summary>
