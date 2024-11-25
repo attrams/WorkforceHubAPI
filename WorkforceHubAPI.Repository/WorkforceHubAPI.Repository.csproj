@@ -2,6 +2,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\WorkforceHubAPI.Entities\WorkforceHubAPI.Entities.csproj" />
+    <ProjectReference Include="..\WorkforceHubAPI.Contracts\WorkforceHubAPI.Contracts.csproj" />
   </ItemGroup>
 
   <ItemGroup>
