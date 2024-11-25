@@ -41,7 +41,7 @@ public class RepositoryContextFactory : IDesignTimeDbContextFactory<RepositoryCo
         // assembly is not in this project but the WorkforceHubAPI.Repository project, ensuring the migrations
         // are kept in this project.
         var builder = new DbContextOptionsBuilder<RepositoryContext>()
-            .UseSqlServer(connectionString, options => options.MigrationsAssembly("WorkforceHubAPI.WebAPI"));
+            .UseSqlServer(connectionString, b => b.MigrationsAssembly("WorkforceHubAPI.WebAPI"));
 
         return new RepositoryContext(builder.Options);
     }
