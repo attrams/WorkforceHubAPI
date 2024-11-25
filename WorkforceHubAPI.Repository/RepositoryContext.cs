@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using WorkforceHubAPI.Entities.Models;
+using WorkforceHubAPI.Repository.Configuration;
 
 namespace WorkforceHubAPI.Repository;
 
@@ -12,7 +13,6 @@ namespace WorkforceHubAPI.Repository;
 /// </remarks>
 public class RepositoryContext : DbContext
 {
-
     /// <summary>
     /// Initializes a new instance of the <see cref="RepositoryContext"/> class.
     /// </summary>
@@ -20,8 +20,16 @@ public class RepositoryContext : DbContext
     /// <remarks>
     /// The options parameter allows external configuration of the database context, such as connection string and provider settings.
     /// </remarks>
-    public RepositoryContext(DbContextOptions options) : base(options)
+    public RepositoryContext(DbContextOptions options)
+        : base(options) { }
+
+    // Override the OnModelCreating method to apply configurations and seed data for the entities.
+    // Both CompanyConfiguration and EmployeeConfiguration add seed data to their respective tables.
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        // Apply configurations and seed data for Company and Employee entities.
+        modelBuilder.ApplyConfiguration(new CompanyConfiguration());
+        modelBuilder.ApplyConfiguration(new EmployeeConfiguration());
     }
 
     /// <summary>
