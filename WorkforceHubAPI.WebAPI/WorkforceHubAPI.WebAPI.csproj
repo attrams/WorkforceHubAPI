@@ -20,6 +20,7 @@
     <ProjectReference Include="..\WorkforceHubAPI.LoggerService\WorkforceHubAPI.LoggerService.csproj" />
     <ProjectReference Include="..\WorkforceHubAPI.Repository\WorkforceHubAPI.Repository.csproj" />
     <ProjectReference Include="..\WorkforceHubAPI.Service\WorkforceHubAPI.Service.csproj" />
+    <ProjectReference Include="..\WorkforceHubAPI.WebAPI.Presentation\WorkforceHubAPI.WebAPI.Presentation.csproj" />
   </ItemGroup>
 
 </Project>

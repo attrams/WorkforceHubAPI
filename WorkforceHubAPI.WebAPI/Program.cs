@@ -35,7 +35,12 @@ builder.Services.ConfigureRepositoryManager();
 
 builder.Services.ConfigureServiceManager();
 
-builder.Services.AddControllers();
+// Configures the application's controller services and ensures that the controllers from the specified
+// assembly (via the AssemblyReference class in WorkforceHubAPI.WebAPI.Presentation project) are included
+// in the application's controller discovery process.
+builder
+    .Services.AddControllers()
+    .AddApplicationPart(typeof(WorkforceHubAPI.WebAPI.Presentation.AssemblyReference).Assembly);
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();

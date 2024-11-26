@@ -1,0 +1,22 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <!-- 
+    References the shared framework "Microsoft.AspNetCore.App" to access ASP.NET Core APIs,
+    which is essential for implementing controllers in the ASP.NET Core WebAPI.
+    This allows the class library to leverage features like routing, action results, model binding,
+    and other web-specific functionality needed for controllers.
+   -->
+  <ItemGroup>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\WorkforceHubAPI.Service.Contracts\WorkforceHubAPI.Service.Contracts.csproj" />
+  </ItemGroup>
+
+</Project>
