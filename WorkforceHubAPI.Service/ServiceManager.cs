@@ -1,3 +1,4 @@
+using AutoMapper;
 using WorkforceHubAPI.Contracts;
 using WorkforceHubAPI.Service.Contracts;
 
@@ -15,13 +16,13 @@ public sealed class ServiceManager : IServiceManager
     // Lazy-loaded instance of the EmployeeService
     private readonly Lazy<IEmployeeService> _employeeService;
 
-    public ServiceManager(IRepositoryManager repositoryManager, ILoggerManager logger)
+    public ServiceManager(IRepositoryManager repositoryManager, ILoggerManager logger, IMapper mapper)
     {
         _companyService = new Lazy<ICompanyService>(
-            () => new CompanyService(repositoryManager, logger)
+            () => new CompanyService(repositoryManager, logger, mapper)
         );
         _employeeService = new Lazy<IEmployeeService>(
-            () => new EmployeeService(repositoryManager, logger)
+            () => new EmployeeService(repositoryManager, logger, mapper)
         );
     }
 

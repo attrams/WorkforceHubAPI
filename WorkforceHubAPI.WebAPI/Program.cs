@@ -35,6 +35,9 @@ builder.Services.ConfigureRepositoryManager();
 
 builder.Services.ConfigureServiceManager();
 
+// configure AutoMapper
+builder.Services.AddAutoMapper(typeof(Program));
+
 // Configures the application's controller services and ensures that the controllers from the specified
 // assembly (via the AssemblyReference class in WorkforceHubAPI.WebAPI.Presentation project) are included
 // in the application's controller discovery process.

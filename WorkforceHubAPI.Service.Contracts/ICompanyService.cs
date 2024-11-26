@@ -1,4 +1,4 @@
-using WorkforceHubAPI.Entities.Models;
+using WorkforceHubAPI.Shared;
 
 namespace WorkforceHubAPI.Service.Contracts;
 
@@ -18,5 +18,5 @@ public interface ICompanyService
     /// <returns>
     /// A collection of all companies in the database.
     /// </returns>
-    IEnumerable<Company> GetAllCompanies(bool trackChanges);
+    IEnumerable<CompanyDto> GetAllCompanies(bool trackChanges);
 }

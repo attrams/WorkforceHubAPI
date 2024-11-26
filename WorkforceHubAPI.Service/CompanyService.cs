@@ -1,6 +1,7 @@
+using AutoMapper;
 using WorkforceHubAPI.Contracts;
-using WorkforceHubAPI.Entities.Models;
 using WorkforceHubAPI.Service.Contracts;
+using WorkforceHubAPI.Shared;
 
 namespace WorkforceHubAPI.Service;
 
@@ -16,10 +17,14 @@ internal sealed class CompanyService : ICompanyService
     // Logger for logging messages and error.
     private readonly ILoggerManager _logger;
 
-    public CompanyService(IRepositoryManager repository, ILoggerManager logger)
+    // AutoMapper IMapper to perform object-to-object mapping.
+    private readonly IMapper _mapper;
+
+    public CompanyService(IRepositoryManager repository, ILoggerManager logger, IMapper mapper)
     {
         _repository = repository;
         _logger = logger;
+        _mapper = mapper;
     }
 
     /// <summary>
@@ -35,13 +40,15 @@ internal sealed class CompanyService : ICompanyService
     /// <exception cref="Exception">
     /// Logs the error and rethrows it if something goes wrong during data retrieval.
     /// </exception>
-    public IEnumerable<Company> GetAllCompanies(bool trackChanges)
+    public IEnumerable<CompanyDto> GetAllCompanies(bool trackChanges)
     {
         try
         {
             var companies = _repository.Company.GetAllCompanies(trackChanges);
 
-            return companies;
+            var companiesDto = _mapper.Map<IEnumerable<CompanyDto>>(companies);
+
+            return companiesDto;
         }
         catch (Exception ex)
         {

@@ -1,3 +1,4 @@
+using AutoMapper;
 using WorkforceHubAPI.Contracts;
 using WorkforceHubAPI.Service.Contracts;
 
@@ -15,9 +16,13 @@ internal sealed class EmployeeService : IEmployeeService
     // Logger for logging messages and errors.
     private readonly ILoggerManager _logger;
 
-    public EmployeeService(IRepositoryManager repository, ILoggerManager logger)
+    // AutoMapper IMapper to perform object-to-object mapping.
+    private readonly IMapper _mapper;
+
+    public EmployeeService(IRepositoryManager repository, ILoggerManager logger, IMapper mapper)
     {
         _repository = repository;
         _logger = logger;
+        _mapper = mapper;
     }
 }
