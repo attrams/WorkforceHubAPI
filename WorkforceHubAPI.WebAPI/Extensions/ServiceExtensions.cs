@@ -1,6 +1,9 @@
+using Microsoft.EntityFrameworkCore;
 using WorkforceHubAPI.Contracts;
 using WorkforceHubAPI.LoggerService;
 using WorkforceHubAPI.Repository;
+using WorkforceHubAPI.Service;
+using WorkforceHubAPI.Service.Contracts;
 
 namespace WorkforceHubAPI.WebAPI.Extensions;
 
@@ -57,4 +60,24 @@ public static class ServiceExtensions
     /// <param name="services">The <see cref="IServiceCollection"/> used for dependency injection.</param>
     public static void ConfigureRepositoryManager(this IServiceCollection services) =>
         services.AddScoped<IRepositoryManager, RepositoryManager>();
+
+    /// <summary>
+    /// Configures the service manager for dependency injection.
+    /// </summary>
+    /// <param name="services">The <see cref="IServiceCollection"/> to which the service manager will be added.</param>
+    public static void ConfigureServiceManager(this IServiceCollection services) =>
+        services.AddScoped<IServiceManager, ServiceManager>();
+
+    /// <summary>
+    /// Configures the SQL Server context in the dependency injection container.
+    /// </summary>
+    /// <param name="services">The service collection to which the database context will be added.</param>
+    /// <param name="configuration">The application configuration for accessing the database connection string.</param>
+    public static void ConfigureSqlContext(
+        this IServiceCollection services,
+        IConfiguration configuration
+    ) =>
+        services.AddDbContext<RepositoryContext>(options =>
+            options.UseSqlServer(configuration.GetConnectionString("DefaultConnection"))
+        );
 }

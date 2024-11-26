@@ -6,6 +6,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Logging.ClearProviders().AddSimpleConsole().AddDebug();
 
+// Add services to the container.
 // configure serilog
 builder.Host.UseSerilog(
     (context, configuration) =>
@@ -24,12 +25,15 @@ builder.Host.UseSerilog(
     writeToProviders: true
 );
 
-// Add services to the container.
 builder.Services.ConfigureCors();
 
 builder.Services.ConfigureLoggerService();
 
+builder.Services.ConfigureSqlContext(builder.Configuration);
+
 builder.Services.ConfigureRepositoryManager();
+
+builder.Services.ConfigureServiceManager();
 
 builder.Services.AddControllers();
 
