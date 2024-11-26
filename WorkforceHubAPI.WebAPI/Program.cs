@@ -1,5 +1,7 @@
 using Microsoft.AspNetCore.HttpOverrides;
 using Serilog;
+using WorkforceHubAPI.Contracts;
+using WorkforceHubAPI.WebAPI;
 using WorkforceHubAPI.WebAPI.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -38,6 +40,9 @@ builder.Services.ConfigureServiceManager();
 // configure AutoMapper
 builder.Services.AddAutoMapper(typeof(Program));
 
+// Configure the ExceptionHandler
+builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
+
 // Configures the application's controller services and ensures that the controllers from the specified
 // assembly (via the AssemblyReference class in WorkforceHubAPI.WebAPI.Presentation project) are included
 // in the application's controller discovery process.
@@ -51,12 +56,10 @@ builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
+app.UseExceptionHandler(options => { });
+
 // Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
-{
-    app.UseDeveloperExceptionPage();
-}
-else
+if (app.Environment.IsProduction())
 {
     app.UseHsts();
 }
