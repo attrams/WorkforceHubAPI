@@ -21,8 +21,8 @@ public class MappingProfile : Profile
         // The FullAddress property in CompanyDto is gotten by concatenating the Address
         // and Country properties from the Company entity.
         CreateMap<Company, CompanyDto>()
-            .ForCtorParam(
-                "FullAddress",
+            .ForMember(
+                company => company.FullAddress,
                 options => options.MapFrom(company => string.Join(' ', company.Address, company.Country))
             );
 

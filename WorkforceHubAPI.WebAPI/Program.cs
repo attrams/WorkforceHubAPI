@@ -46,8 +46,15 @@ builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
 // Configures the application's controller services and ensures that the controllers from the specified
 // assembly (via the AssemblyReference class in WorkforceHubAPI.WebAPI.Presentation project) are included
 // in the application's controller discovery process.
+// Adds XML serialization support, allowing the API to return responses in XML format if specified in the
+// 'Accept' header of the request.
 builder
-    .Services.AddControllers()
+    .Services.AddControllers(config =>
+    {
+        config.RespectBrowserAcceptHeader = true;
+        config.ReturnHttpNotAcceptable = true;
+    })
+    .AddXmlDataContractSerializerFormatters()
     .AddApplicationPart(typeof(WorkforceHubAPI.WebAPI.Presentation.AssemblyReference).Assembly);
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle

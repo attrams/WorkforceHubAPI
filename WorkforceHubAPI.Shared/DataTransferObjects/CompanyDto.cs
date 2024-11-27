@@ -1,11 +1,24 @@
 namespace WorkforceHubAPI.Shared.DataTransferObjects;
 
 /// <summary>
-/// Represents a Data Transfer Object (DTO) for Company Entity.
-/// This DTO is used to transfer company data between the API and clients,
-/// while ensuring that only the necessary information is exposed.
+/// Represents a Data Transfer Object (DTO) for the Company entity, used to encapsulate and transfer data
+/// between the service layer and presentation layer. The structure supports serialization to both JSON,
+/// XML, and CSV formats, enabling flexible API responses.
 /// </summary>
-/// <param name="Id">The unique identifier of the company.</param>
-/// <param name="Name">The name of the company.</param>
-/// <param name="FullAddress">The full address of the company, constructed by joining company's address and country.</param>
-public record CompanyDto(Guid Id, string Name, string FullAddress);
+public record CompanyDto
+{
+    /// <summary>
+    /// Gets the unique identifier of the company.
+    /// </summary>
+    public Guid Id { get; init; }
+
+    /// <summary>
+    /// Gets the name of the company.
+    /// </summary>
+    public string? Name { get; init; }
+
+    /// <summary>
+    /// Gets the full address of the company, constructed by combining the address and country.
+    /// </summary>
+    public string? FullAddress { get; init; }
+}
