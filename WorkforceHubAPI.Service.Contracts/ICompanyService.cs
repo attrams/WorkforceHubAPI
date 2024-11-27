@@ -19,4 +19,12 @@ public interface ICompanyService
     /// A collection of all companies in the database.
     /// </returns>
     IEnumerable<CompanyDto> GetAllCompanies(bool trackChanges);
+
+    /// <summary>
+    /// Retrieves a specific company by its unique identifier and maps it to a data transfer object (DTO).
+    /// </summary>
+    /// <param name="companyId">The unique identifier of the company to retrieve.</param>
+    /// <param name="trackChanges">A flag indicating whether to track changes to the retrieved entity.</param>
+    /// <returns>A data transfer object (DTO) representing the company with the specified identifier.</returns>
+    CompanyDto GetCompany(Guid companyId, bool trackChanges);
 }

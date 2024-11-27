@@ -27,4 +27,15 @@ public class CompanyRepository : RepositoryBase<Company>, ICompanyRepository
     {
         return FindAll(trackChanges).OrderBy(company => company.Name).ToList();
     }
+
+    /// <summary>
+    /// Retrieves a specific company by its unique identifier from the database.
+    /// </summary>
+    /// <param name="companyId">The unique identifier of the company to retrieve.</param>
+    /// <param name="trackChanges">A flag indicating whether to track changes to the retrieved entity.</param>
+    /// <returns>The company entity with the specified identifier, or null if no match is found.</returns>
+    public Company GetCompany(Guid companyId, bool trackChanges)
+    {
+        return FindByCondition(company => company.Id.Equals(companyId), trackChanges).SingleOrDefault();
+    }
 }

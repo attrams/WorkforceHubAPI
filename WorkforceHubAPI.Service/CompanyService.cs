@@ -37,9 +37,6 @@ internal sealed class CompanyService : ICompanyService
     /// <returns>
     /// A collection of all companies in the database.
     /// </returns>
-    /// <exception cref="Exception">
-    /// Logs the error and rethrows it if something goes wrong during data retrieval.
-    /// </exception>
     public IEnumerable<CompanyDto> GetAllCompanies(bool trackChanges)
     {
         var companies = _repository.Company.GetAllCompanies(trackChanges);
@@ -47,5 +44,19 @@ internal sealed class CompanyService : ICompanyService
         var companiesDto = _mapper.Map<IEnumerable<CompanyDto>>(companies);
 
         return companiesDto;
+    }
+
+    /// <summary>
+    /// Retrieves a specific company by its unique identifier and maps it to a data transfer object (DTO).
+    /// </summary>
+    /// <param name="companyId">The unique identifier of the company to retrieve.</param>
+    /// <param name="trackChanges">A flag indicating whether to track changes to the retrieved entity.</param>
+    /// <returns>A data transfer object (DTO) representing the company with the specified identifier.</returns>
+    public CompanyDto GetCompany(Guid companyId, bool trackChanges)
+    {
+        var company = _repository.Company.GetCompany(companyId, trackChanges);
+        var companyDto = _mapper.Map<CompanyDto>(company);
+
+        return companyDto;
     }
 }
