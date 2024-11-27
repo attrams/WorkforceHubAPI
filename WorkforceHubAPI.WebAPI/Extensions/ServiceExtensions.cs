@@ -80,4 +80,13 @@ public static class ServiceExtensions
         services.AddDbContext<RepositoryContext>(options =>
             options.UseSqlServer(configuration.GetConnectionString("DefaultConnection"))
         );
+
+    /// <summary>
+    /// Configures the custom CSV output formatter by adding it to the MVC pipeline.
+    /// </summary>
+    /// <param name="builder">The <see cref="IMvcBuilder"/> instance to configure MVC options.</param>
+    /// <returns>The updated <see cref="IMvcBuilder"/> instance with the CSV output formatter added.</returns>
+    public static IMvcBuilder AddCustomCSVFormatter(this IMvcBuilder builder) => builder.AddMvcOptions(
+        config => config.OutputFormatters.Add(new CsvOutputFormatter())
+    );
 }
