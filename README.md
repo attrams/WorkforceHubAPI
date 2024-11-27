@@ -89,4 +89,5 @@ Follow these steps to get the API up and running on your local machine.
 - Entity Framework Core (EF Core)
 - SQL Server
 - Serilog for logging
+- AutoMapper for mapping DTOs
 - Docker
