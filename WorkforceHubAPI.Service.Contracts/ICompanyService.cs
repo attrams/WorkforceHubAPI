@@ -1,4 +1,4 @@
-using WorkforceHubAPI.Shared;
+using WorkforceHubAPI.Shared.DataTransferObjects;
 
 namespace WorkforceHubAPI.Service.Contracts;
 

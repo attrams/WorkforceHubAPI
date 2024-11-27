@@ -1,9 +1,8 @@
-using System.Diagnostics;
 using AutoMapper;
 using WorkforceHubAPI.Contracts;
 using WorkforceHubAPI.Entities.Exceptions;
 using WorkforceHubAPI.Service.Contracts;
-using WorkforceHubAPI.Shared;
+using WorkforceHubAPI.Shared.DataTransferObjects;
 
 namespace WorkforceHubAPI.Service;
 

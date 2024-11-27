@@ -1,4 +1,4 @@
-namespace WorkforceHubAPI.Shared;
+namespace WorkforceHubAPI.Shared.DataTransferObjects;
 
 /// <summary>
 /// Represents a Data Transfer Object (DTO) for Company Entity.

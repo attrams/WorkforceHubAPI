@@ -1,6 +1,6 @@
 using AutoMapper;
 using WorkforceHubAPI.Entities.Models;
-using WorkforceHubAPI.Shared;
+using WorkforceHubAPI.Shared.DataTransferObjects;
 
 namespace WorkforceHubAPI.WebAPI;
 
@@ -25,5 +25,8 @@ public class MappingProfile : Profile
                 "FullAddress",
                 options => options.MapFrom(company => string.Join(' ', company.Address, company.Country))
             );
+
+        // Configures the mapping between the Employee entity and EmployeeDto.
+        CreateMap<Employee, EmployeeDto>();
     }
 }
