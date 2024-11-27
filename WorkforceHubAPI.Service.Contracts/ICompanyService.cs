@@ -26,5 +26,5 @@ public interface ICompanyService
     /// <param name="companyId">The unique identifier of the company to retrieve.</param>
     /// <param name="trackChanges">A flag indicating whether to track changes to the retrieved entity.</param>
     /// <returns>A data transfer object (DTO) representing the company with the specified identifier.</returns>
-    CompanyDto GetCompany(Guid companyId, bool trackChanges);
+    CompanyDto GetCompany(string companyId, bool trackChanges);
 }

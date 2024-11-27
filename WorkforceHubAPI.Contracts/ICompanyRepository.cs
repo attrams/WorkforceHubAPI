@@ -26,5 +26,5 @@ public interface ICompanyRepository
     /// <param name="companyId">The unique identifier of the company to retrieve.</param>
     /// <param name="trackChanges">A flag indicating whether to track changes to the retrieved entity.</param>
     /// <returns>The company entity with the specified identifier, or null if no match is found.</returns>
-    Company GetCompany(Guid companyId, bool trackChanges);
+    Company? GetCompany(Guid companyId, bool trackChanges);
 }

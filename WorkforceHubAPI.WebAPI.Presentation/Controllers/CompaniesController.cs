@@ -47,8 +47,8 @@ public class CompaniesController : ControllerBase
     /// </summary>
     /// <param name="id">The unique identifier of the company to retrieve.</param>
     /// <returns>An <see cref="IActionResult"/> containing the company data transfer object (DTO) if found.</returns>
-    [HttpGet("{id:guid}")]
-    public IActionResult GetCompany(Guid id)
+    [HttpGet("{id}")]
+    public IActionResult GetCompany(string id)
     {
         var company = _service.CompanyService.GetCompany(id, trackChanges: false);
 

@@ -2,6 +2,7 @@ using System.Net;
 using Microsoft.AspNetCore.Diagnostics;
 using WorkforceHubAPI.Contracts;
 using WorkforceHubAPI.Entities.ErrorModel;
+using WorkforceHubAPI.Entities.Exceptions;
 
 namespace WorkforceHubAPI.WebAPI;
 
@@ -35,8 +36,7 @@ public class GlobalExceptionHandler : IExceptionHandler
     /// </returns>
     public async ValueTask<bool> TryHandleAsync(HttpContext httpContext, Exception exception, CancellationToken cancellationToken)
     {
-        // Set the response status code and content type. 
-        httpContext.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
+        // Set the content type. 
         httpContext.Response.ContentType = "application/json";
 
         // Retrieve the exception details from the context.
@@ -44,6 +44,16 @@ public class GlobalExceptionHandler : IExceptionHandler
 
         if (contextFeature != null)
         {
+            // Dynamically set the HTTP response status code based on the type of exception encountered.
+            // If the exception inherits the NotFoundException or InvalidIdFormatException, it responds with a 404 Not Found status.
+            // For any other exception types, respond with a 500 Internal Server Error status.
+            httpContext.Response.StatusCode = contextFeature.Error switch
+            {
+                NotFoundException => StatusCodes.Status404NotFound,
+
+                _ => StatusCodes.Status500InternalServerError
+            };
+
             _logger.LogError($"Something went wrong: {contextFeature.Error}");
 
             // Create and return a structured error response.
@@ -51,7 +61,7 @@ public class GlobalExceptionHandler : IExceptionHandler
                 new ErrorDetails()
                 {
                     StatusCode = httpContext.Response.StatusCode,
-                    Message = "Internal Server Error."
+                    Message = contextFeature.Error.Message
                 }.ToString()
             );
         }

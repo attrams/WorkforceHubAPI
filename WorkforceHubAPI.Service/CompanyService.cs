@@ -1,5 +1,7 @@
+using System.Diagnostics;
 using AutoMapper;
 using WorkforceHubAPI.Contracts;
+using WorkforceHubAPI.Entities.Exceptions;
 using WorkforceHubAPI.Service.Contracts;
 using WorkforceHubAPI.Shared;
 
@@ -52,9 +54,20 @@ internal sealed class CompanyService : ICompanyService
     /// <param name="companyId">The unique identifier of the company to retrieve.</param>
     /// <param name="trackChanges">A flag indicating whether to track changes to the retrieved entity.</param>
     /// <returns>A data transfer object (DTO) representing the company with the specified identifier.</returns>
-    public CompanyDto GetCompany(Guid companyId, bool trackChanges)
+    public CompanyDto GetCompany(string companyId, bool trackChanges)
     {
-        var company = _repository.Company.GetCompany(companyId, trackChanges);
+        if (!Guid.TryParse(companyId, out var parsedId))
+        {
+            throw new InvalidIdFormatException($"The company with id: {companyId} doesn't exist.");
+        }
+
+        var company = _repository.Company.GetCompany(parsedId, trackChanges);
+
+        if (company is null)
+        {
+            throw new CompanyNotFoundException(parsedId);
+        }
+
         var companyDto = _mapper.Map<CompanyDto>(company);
 
         return companyDto;
