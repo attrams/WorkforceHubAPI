@@ -13,8 +13,9 @@ A RESTful API for managing employees, companies, and related data. This API supp
     - [4. **WorkforceHubAPI.Repository**](#4-workforcehubapirepository)
     - [5. **WorkforceHubAPI.Service**](#5-workforcehubapiservice)
     - [6. **WorkforceHubAPI.Service.Contracts**](#6-workforcehubapiservicecontracts)
-    - [7. **WorkforceHubAPI.WebAPI**](#7-workforcehubapiwebapi)
-    - [8. **WorkforceHubAPI.WebAPI.Presentation**](#8-workforcehubapiwebapipresentation)
+    - [7. **WorkforceHubAPI.Shared**](#7-workforcehubapishared)
+    - [8. **WorkforceHubAPI.WebAPI**](#8-workforcehubapiwebapi)
+    - [9. **WorkforceHubAPI.WebAPI.Presentation**](#9-workforcehubapiwebapipresentation)
   - [Features](#features)
   - [Getting Started](#getting-started)
     - [Prerequisites](#prerequisites)
@@ -53,12 +54,16 @@ responsibility. Below is a breakdown of each project in the solution:
   - **Purpose**: Contains interfaces for business logic services.
   - **Responsibilities**: Defines service interfaces for handling business logic related to entities like `Company` and `Employee`.
 
-### 7. **WorkforceHubAPI.WebAPI**
+### 7. **WorkforceHubAPI.Shared**
+  - **Purpose**: Contains shared resources that are used across multiple projects within the application.
+  - **Responsibilities**: Defines shared resources such as **DTOs (Data Transfer Objects)** for communication between different layers of the application (e.g., `CompanyDto`, `EmployeeDto`).
+
+### 8. **WorkforceHubAPI.WebAPI**
   - **Purpose**: Contains the entry point of the application and configuration.
   - **Responsibilities**: Contains the `Program.cs` file where the application is configured and started. This project serves as the API host, wiring up services and dependencies from the other projects, setting up the DI container, and configuring middleware.
 
 
-### 8. **WorkforceHubAPI.WebAPI.Presentation**
+### 9. **WorkforceHubAPI.WebAPI.Presentation**
   - **Purpose**: Contains the controllers for the API.
   - **Responsibilities**: Holds the API controllers responsible for handling HTTP requests and responding with the appropriate data. These controllers interact with services from `WorkforceHubAPI.Service` to process data.
 
