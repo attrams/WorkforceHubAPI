@@ -23,10 +23,13 @@ public class MappingProfile : Profile
         CreateMap<Company, CompanyDto>()
             .ForMember(
                 company => company.FullAddress,
-                options => options.MapFrom(company => string.Join(' ', company.Address, company.Country))
+                options => options.MapFrom(company => string.Join(", ", company.Address, company.Country))
             );
 
         // Configures the mapping between the Employee entity and EmployeeDto.
         CreateMap<Employee, EmployeeDto>();
+
+        // Configures the mapping between the CompanyForCreationDto and Company entity.
+        CreateMap<CompanyForCreationDto, Company>();
     }
 }

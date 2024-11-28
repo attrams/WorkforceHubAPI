@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.HttpOverrides;
+using Microsoft.AspNetCore.Mvc;
 using Serilog;
 using WorkforceHubAPI.Contracts;
 using WorkforceHubAPI.WebAPI;
@@ -42,6 +43,12 @@ builder.Services.AddAutoMapper(typeof(Program));
 
 // Configure the ExceptionHandler
 builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
+
+// enable custom response for controllers
+builder.Services.Configure<ApiBehaviorOptions>(options =>
+{
+    options.SuppressModelStateInvalidFilter = true;
+});
 
 // Configures the application's controller services and ensures that the controllers from the specified
 // assembly (via the AssemblyReference class in WorkforceHubAPI.WebAPI.Presentation project) are included

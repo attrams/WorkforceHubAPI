@@ -45,11 +45,12 @@ public class GlobalExceptionHandler : IExceptionHandler
         if (contextFeature != null)
         {
             // Dynamically set the HTTP response status code based on the type of exception encountered.
-            // If the exception inherits the NotFoundException or InvalidIdFormatException, it responds with a 404 Not Found status.
+            // If the exception inherits the NotFoundException, it responds with a 404 Not Found status.
             // For any other exception types, respond with a 500 Internal Server Error status.
             httpContext.Response.StatusCode = contextFeature.Error switch
             {
                 NotFoundException => StatusCodes.Status404NotFound,
+                BadRequestException => StatusCodes.Status400BadRequest,
 
                 _ => StatusCodes.Status500InternalServerError
             };

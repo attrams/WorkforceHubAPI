@@ -27,4 +27,11 @@ public interface ICompanyService
     /// <param name="trackChanges">A flag indicating whether to track changes to the retrieved entity.</param>
     /// <returns>A data transfer object (DTO) representing the company with the specified identifier.</returns>
     CompanyDto GetCompany(string companyId, bool trackChanges);
+
+    /// <summary>
+    /// Creates a new company based on the provided data in the data transfer object.
+    /// </summary>
+    /// <param name="company">The data transfer object containing the details of the company to be created.</param>
+    /// <returns>The created company as a data transfer object.</returns>
+    CompanyDto CreateCompany(CompanyForCreationDto company);
 }

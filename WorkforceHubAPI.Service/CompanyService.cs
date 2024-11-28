@@ -1,6 +1,7 @@
 using AutoMapper;
 using WorkforceHubAPI.Contracts;
 using WorkforceHubAPI.Entities.Exceptions;
+using WorkforceHubAPI.Entities.Models;
 using WorkforceHubAPI.Service.Contracts;
 using WorkforceHubAPI.Shared.DataTransferObjects;
 
@@ -70,5 +71,29 @@ internal sealed class CompanyService : ICompanyService
         var companyDto = _mapper.Map<CompanyDto>(company);
 
         return companyDto;
+    }
+
+    /// <summary>
+    /// Creates a new company by mapping the input DTO to the company entity, saves it in the repository,
+    /// and maps the saved entity back to a <see cref="CompanyDto"/> for returning.
+    /// </summary>
+    /// <param name="company">The data transfer object containing the company details.</param>
+    /// <returns>The created company as a <see cref="CompanyDto"/>.</returns>
+    /// <exception cref="BadRequestException">Thrown when the provided <see cref="CompanyForCreationDto"/> is null.</exception>
+    public CompanyDto CreateCompany(CompanyForCreationDto company)
+    {
+        if (company is null)
+        {
+            throw new BadRequestException("CompanyForCreationDto object is null.");
+        }
+
+        var companyEntity = _mapper.Map<Company>(company);
+
+        _repository.Company.CreateCompany(companyEntity);
+        _repository.Save();
+
+        var companyToReturn = _mapper.Map<CompanyDto>(companyEntity);
+
+        return companyToReturn;
     }
 }

@@ -38,4 +38,13 @@ public class CompanyRepository : RepositoryBase<Company>, ICompanyRepository
     {
         return FindByCondition(company => company.Id.Equals(companyId), trackChanges).SingleOrDefault();
     }
+
+    /// <summary>
+    /// Implements the creation of a new company entity by using the base repository 'Create' method.
+    /// </summary>
+    /// <param name="company">The company entity to be created.</param>
+    public void CreateCompany(Company company)
+    {
+        Create(company);
+    }
 }

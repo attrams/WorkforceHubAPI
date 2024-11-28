@@ -27,4 +27,10 @@ public interface ICompanyRepository
     /// <param name="trackChanges">A flag indicating whether to track changes to the retrieved entity.</param>
     /// <returns>The company entity with the specified identifier, or null if no match is found.</returns>
     Company? GetCompany(Guid companyId, bool trackChanges);
+
+    /// <summary>
+    /// Adds a new company entity.
+    /// </summary>
+    /// <param name="company">The company entity to be created.</param>
+    void CreateCompany(Company company);
 }
