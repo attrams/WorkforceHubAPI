@@ -6,4 +6,5 @@ namespace WorkforceHubAPI.Shared.DataTransferObjects;
 /// <param name="Name">The name of the company.</param>
 /// <param name="Address">The address of the company.</param>
 /// <param name="Country">The country where the company is located.</param>
-public record CompanyForCreationDto(string Name, string Address, string Country);
+/// <param name="Employees">An optional list of employees to be associated with the company during its creation.</param>
+public record CompanyForCreationDto(string Name, string Address, string Country, IEnumerable<EmployeeForCreationDto> Employees);
