@@ -24,10 +24,10 @@ jobs:
         dotnet-version: 8.0.x
         
     - name: Restore dependencies
-      run: dotnet restore
+      run: dotnet restore ./WorkforceHubAPI/WorkforceHubAPI.sln
       
     - name: Build projects
-      run: dotnet build --configuration Release
+      run: dotnet build ./WorkforceHubAPI/WorkforceHubAPI.sln --configuration Release
       
     - name: Publish artifacts
       run: dotnet publish WorkforceHubAPI.WebAPI/WorkforceHubAPI.WebAPI.csproj --configuration Release --output ./out
