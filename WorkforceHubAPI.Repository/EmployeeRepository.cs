@@ -48,4 +48,17 @@ public class EmployeeRepository : RepositoryBase<Employee>, IEmployeeRepository
         ).SingleOrDefault();
     }
 
+    /// <summary>
+    /// Associates a new employee with a specific company and adds the employee to the database.
+    /// </summary>
+    /// <param name="companyId">The unique identifier of the company to which the employee will be associated.</param>
+    /// <param name="employee">The employee entity to be added to the database.</param>
+    public void CreateEmployeeForCompany(Guid companyId, Employee employee)
+    {
+        // set the companyId property of the employee entity to associate it with the given company.
+        employee.CompanyId = companyId;
+
+        // Use the base repository 'Create' method to add the employee entity to the database.
+        Create(employee);
+    }
 }

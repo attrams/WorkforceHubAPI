@@ -31,5 +31,8 @@ public class MappingProfile : Profile
 
         // Configures the mapping between the CompanyForCreationDto and Company entity.
         CreateMap<CompanyForCreationDto, Company>();
+
+        // Configures the mapping between EmployeeForCreationDto and Employee entity.
+        CreateMap<EmployeeForCreationDto, Employee>();
     }
 }

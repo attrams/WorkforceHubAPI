@@ -1,6 +1,7 @@
 using AutoMapper;
 using WorkforceHubAPI.Contracts;
 using WorkforceHubAPI.Entities.Exceptions;
+using WorkforceHubAPI.Entities.Models;
 using WorkforceHubAPI.Service.Contracts;
 using WorkforceHubAPI.Shared.DataTransferObjects;
 
@@ -95,5 +96,44 @@ internal sealed class EmployeeService : IEmployeeService
         var employee = _mapper.Map<EmployeeDto>(employeeDb);
 
         return employee;
+    }
+
+    /// <summary>
+    /// Implements the functionality to create a new employee and associate them with a specific company.
+    /// </summary>
+    /// <param name="companyId">The unique identifier of the company to which the employee will belong to.</param>
+    /// <param name="employeeForCreation">The data transfer object containing the details of the employee to be created.</param>
+    /// <param name="trackChanges">A flag indicating whether to track changes on the retrieved company entity.</param>
+    /// <returns></returns>
+    /// <exception cref="BadRequestException">Thrown when the <paramref name="employeeForCreation"/> is null.</exception>
+    /// <exception cref="InvalidIdFormatException">Thrown when the <paramref name="companyId"/> is not in a valid format.</exception>
+    /// <exception cref="CompanyNotFoundException">Thrown when the specified company is not found in the database.</exception>
+    public EmployeeDto CreateEmployeeForCompany(string companyId, EmployeeForCreationDto employeeForCreation, bool trackChanges)
+    {
+        if (employeeForCreation is null)
+        {
+            throw new BadRequestException("EmployeeForCreationDto object is null.");
+        }
+
+        if (!Guid.TryParse(companyId, out var parsedCompanyId))
+        {
+            throw new InvalidIdFormatException($"The company with id: {companyId} doesn't exist in the database.");
+        }
+
+        var company = _repository.Company.GetCompany(parsedCompanyId, trackChanges);
+
+        if (company is null)
+        {
+            throw new CompanyNotFoundException(parsedCompanyId);
+        }
+
+        var employeeEntity = _mapper.Map<Employee>(employeeForCreation);
+
+        _repository.Employee.CreateEmployeeForCompany(parsedCompanyId, employeeEntity);
+        _repository.Save();
+
+        var employeeToReturn = _mapper.Map<EmployeeDto>(employeeEntity);
+
+        return employeeToReturn;
     }
 }

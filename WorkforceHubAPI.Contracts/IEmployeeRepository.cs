@@ -32,4 +32,11 @@ public interface IEmployeeRepository
     /// no match is found.
     /// </returns>
     Employee? GetEmployee(Guid companyId, Guid employeeId, bool trackChanges);
+
+    /// <summary>
+    /// Adds a new employee to the company with the specified company id.
+    /// </summary>
+    /// <param name="companyId">The unique identifier of the company to which the employee will belong to.</param>
+    /// <param name="employee">The employee entity to be created.</param>
+    void CreateEmployeeForCompany(Guid companyId, Employee employee);
 }
