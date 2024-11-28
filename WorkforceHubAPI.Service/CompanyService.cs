@@ -74,6 +74,61 @@ internal sealed class CompanyService : ICompanyService
     }
 
     /// <summary>
+    /// Retrieves a collection of companies based on the provided IDs.
+    /// </summary>
+    /// <param name="companyIds">A collection of strings representing the IDs of the companies to retrieve.</param>
+    /// <param name="trackChanges">
+    /// A boolean value indicating whether changes to the entities should be tracked by the context.
+    /// If set to true, the context tracks changes, otherwise it does not.
+    /// </param>
+    /// <returns>A collection of <see cref="CompanyDto"/> representing the retrieved companies.</returns>
+    /// <exception cref="IdParametersBadRequestException">Thrown when the 'companyIds' paramter is null.</exception>
+    /// <exception cref="CollectionByIdsBadRequestException">
+    /// Thrown when some of the provided IDs are invalid or do not correspond to any existing companies in the database.
+    /// </exception>
+    public IEnumerable<CompanyDto> GetByIds(IEnumerable<string> companyIds, bool trackChanges)
+    {
+        // Thrown when the company ids is null or empty.
+        if (companyIds is null || !companyIds.Any())
+        {
+            throw new IdParametersBadRequestException();
+        }
+
+        var validGuids = new List<Guid>();
+        var invalidGuids = new List<string>();
+
+        foreach (var companyId in companyIds)
+        {
+            if (Guid.TryParse(companyId, out var parsedCompanyId))
+            {
+                validGuids.Add(parsedCompanyId);
+            }
+            else
+            {
+                invalidGuids.Add(companyId);
+            }
+        }
+
+        // Thrown when the provided company ids contain invalid GUID format.
+        if (invalidGuids.Any())
+        {
+            throw new CollectionByIdsBadRequestException();
+        }
+
+        var companyEntities = _repository.Company.GetByIds(validGuids, trackChanges);
+
+        // Thrown when the valid company ids contain id(s) that does not exist.
+        if (validGuids.Count() != companyEntities.Count())
+        {
+            throw new CollectionByIdsBadRequestException();
+        }
+
+        var companiesToReturn = _mapper.Map<IEnumerable<CompanyDto>>(companyEntities);
+
+        return companiesToReturn;
+    }
+
+    /// <summary>
     /// Creates a new company by mapping the input DTO to the company entity, saves it in the repository,
     /// and maps the saved entity back to a <see cref="CompanyDto"/> for returning.
     /// </summary>
@@ -95,5 +150,38 @@ internal sealed class CompanyService : ICompanyService
         var companyToReturn = _mapper.Map<CompanyDto>(companyEntity);
 
         return companyToReturn;
+    }
+
+    /// <summary>
+    /// Creates multiple companies and returns the created companies along with their IDs as a string.
+    /// </summary>
+    /// <param name="companyCollection">The collection of companies to be created.</param>
+    /// <returns>
+    /// A tuple containing:
+    /// - companies: The collection of created companies as DTos.
+    /// - companyIds: A comma-seperated string of the IDs of the created companies.
+    /// </returns>
+    /// <exception cref="CompanyCollectionBadRequestException">
+    /// Thrown if the provided company collection is null or does not contain any companies.
+    /// </exception>
+    public (IEnumerable<CompanyDto> companies, string companyIds) CreateCompanyCollection(IEnumerable<CompanyForCreationDto> companyCollection)
+    {
+        if (companyCollection is null || !companyCollection.Any())
+        {
+            throw new CompanyCollectionBadRequestException();
+        }
+
+        var companyEntities = _mapper.Map<IEnumerable<Company>>(companyCollection);
+        foreach (var company in companyEntities)
+        {
+            _repository.Company.CreateCompany(company);
+        }
+
+        _repository.Save();
+
+        var companyCollectionToReturn = _mapper.Map<IEnumerable<CompanyDto>>(companyEntities);
+        var companyIds = string.Join(",", companyCollectionToReturn.Select(company => company.Id));
+
+        return (companies: companyCollectionToReturn, companyIds: companyIds);
     }
 }

@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using WorkforceHubAPI.Service.Contracts;
 using WorkforceHubAPI.Shared.DataTransferObjects;
+using WorkforceHubAPI.WebAPI.Presentation.ModelBinders;
 
 namespace WorkforceHubAPI.WebAPI.Presentation.Controllers;
 
@@ -57,6 +58,22 @@ public class CompanyController : ControllerBase
     }
 
     /// <summary>
+    /// Retrieves a collection of companies based on the provided IDs.
+    /// </summary>
+    /// <param name="companyIds">A collection of strings representing IDs of the companies to retrieve.</param>
+    /// <returns>
+    /// An <see cref="IActionResult"/> containing an HTTP 200 OK response with the collection of companies if the 
+    /// retrieval is successful.
+    /// </returns>
+    [HttpGet("collection", Name = "CompanyCollection")]
+    public IActionResult GetCompanyCollection([ModelBinder(BinderType = typeof(ArrayModelBinder))] IEnumerable<string> companyIds)
+    {
+        var companies = _service.CompanyService.GetByIds(companyIds, trackChanges: false);
+
+        return Ok(companies);
+    }
+
+    /// <summary>
     /// Handles the POST request to create a new company.
     /// </summary>
     /// <param name="company">The data transfer object containing the company details.</param>
@@ -70,5 +87,25 @@ public class CompanyController : ControllerBase
 
         // Return the created company with the appropriate route for retrieving it.
         return CreatedAtRoute("CompanyById", new { id = createdCompany.Id }, createdCompany);
+    }
+
+    /// <summary>
+    /// Creates multiple companies in a single POST request.
+    /// </summary>
+    /// <param name="companyCollection">
+    /// The collection of companies to be created, provided as a list of <see cref="CompanyForCreationDto"/> objects.
+    /// </param>
+    /// <returns>
+    /// An HTTP response indicating the result of the creation operation:
+    /// - On success, returns a `201 Created` response containing the newly created companies and their IDs.
+    /// - If the provided company collection is null or empty, returns a `400 Bad Request` response.
+    /// </returns>
+    [HttpPost("collection")]
+    public IActionResult CreateCompanyCollection([FromBody] IEnumerable<CompanyForCreationDto> companyCollection)
+    {
+        var result = _service.CompanyService.CreateCompanyCollection(companyCollection);
+        var queryString = new { companyIds = string.Join(",", result.companyIds) };
+
+        return CreatedAtRoute("CompanyCollection", queryString, result.companies);
     }
 }

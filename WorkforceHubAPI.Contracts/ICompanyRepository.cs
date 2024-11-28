@@ -29,6 +29,17 @@ public interface ICompanyRepository
     Company? GetCompany(Guid companyId, bool trackChanges);
 
     /// <summary>
+    /// Retrieves a collection of companies based on the specified list of company IDs.
+    /// </summary>
+    /// <param name="companyIds">A collection of GUIDs representing the IDs of the companies to retrieve.</param>
+    /// <param name="trackChanges">
+    /// A boolean indicating whether the entities should be tracked by the context.
+    /// Set to true to enable tracking; otherwise, false for no tracking.
+    /// </param>
+    /// <returns>A collection of companies matching the provided IDs.</returns>
+    IEnumerable<Company> GetByIds(IEnumerable<Guid> companyIds, bool trackChanges);
+
+    /// <summary>
     /// Adds a new company entity.
     /// </summary>
     /// <param name="company">The company entity to be created.</param>

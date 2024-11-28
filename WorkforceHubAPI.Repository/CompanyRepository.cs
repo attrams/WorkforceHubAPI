@@ -40,6 +40,20 @@ public class CompanyRepository : RepositoryBase<Company>, ICompanyRepository
     }
 
     /// <summary>
+    /// Retrieves a collection of companies whose IDs match the specified list of GUIDs.
+    /// </summary>
+    /// <param name="companyIds">A collection of GUIDs representing the IDs of the companies to retrieve.</param>
+    /// <param name="trackChanges">
+    /// A boolean indicating whether the entities should be tracked by the context.
+    /// Set to true to enable tracking; otherwise, false for no tracking.
+    /// </param>
+    /// <returns>A collection of companies matching the provided IDs.</returns>
+    public IEnumerable<Company> GetByIds(IEnumerable<Guid> companyIds, bool trackChanges)
+    {
+        return FindByCondition(company => companyIds.Contains(company.Id), trackChanges).ToList();
+    }
+
+    /// <summary>
     /// Implements the creation of a new company entity by using the base repository 'Create' method.
     /// </summary>
     /// <param name="company">The company entity to be created.</param>
