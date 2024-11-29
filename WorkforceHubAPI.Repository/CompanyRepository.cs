@@ -61,4 +61,10 @@ public class CompanyRepository : RepositoryBase<Company>, ICompanyRepository
     {
         Create(company);
     }
+
+    /// <inheritdoc/>
+    public void DeleteCompany(Company company)
+    {
+        Delete(company);
+    }
 }

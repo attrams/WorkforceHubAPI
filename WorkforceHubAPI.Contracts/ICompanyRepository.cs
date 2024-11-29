@@ -44,4 +44,10 @@ public interface ICompanyRepository
     /// </summary>
     /// <param name="company">The company entity to be created.</param>
     void CreateCompany(Company company);
+
+    /// <summary>
+    /// Deletes the specified company entity from the database.
+    /// </summary>
+    /// <param name="company">The company entity to be deleted.</param>
+    void DeleteCompany(Company company);
 }

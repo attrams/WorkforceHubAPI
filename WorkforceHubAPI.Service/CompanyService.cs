@@ -184,4 +184,24 @@ internal sealed class CompanyService : ICompanyService
 
         return (companies: companyCollectionToReturn, companyIds: companyIds);
     }
+
+    /// <inheritdoc/>
+    /// <exception cref="InvalidIdFormatException">Thrown if the provided company ID is not a valid GUID.</exception>
+    /// <exception cref="CompanyNotFoundException">Thrown if the company with the specified ID does not exist.</exception>
+    public void DeleteCompany(string companyId, bool trackChanges)
+    {
+        if (!Guid.TryParse(companyId, out var parsedCompanyId))
+        {
+            throw new InvalidIdFormatException($"The company with id: {companyId} doesn't exist.");
+        }
+
+        var company = _repository.Company.GetCompany(parsedCompanyId, trackChanges);
+        if (company is null)
+        {
+            throw new CompanyNotFoundException(parsedCompanyId);
+        }
+
+        _repository.Company.DeleteCompany(company);
+        _repository.Save();
+    }
 }

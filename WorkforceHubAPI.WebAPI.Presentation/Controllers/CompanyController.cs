@@ -108,4 +108,17 @@ public class CompanyController : ControllerBase
 
         return CreatedAtRoute("CompanyCollection", queryString, result.companies);
     }
+
+    /// <summary>
+    /// Handles the HTTP DELETE request to delete a specific company by its ID.
+    /// </summary>
+    /// <param name="companyId">The ID of the company to delete.</param>
+    /// <returns>A NoContent (204) response if the deletion is successful. </returns>
+    [HttpDelete("{companyId}")]
+    public IActionResult DeleteCompany(string companyId)
+    {
+        _service.CompanyService.DeleteCompany(companyId, trackChanges: false);
+
+        return NoContent();
+    }
 }

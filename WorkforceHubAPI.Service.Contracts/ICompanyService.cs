@@ -56,4 +56,11 @@ public interface ICompanyService
     /// - companyIds: A comma-seperated string of the IDs of the created companies.
     /// </returns>
     (IEnumerable<CompanyDto> companies, string companyIds) CreateCompanyCollection(IEnumerable<CompanyForCreationDto> companyCollection);
+
+    /// <summary>
+    /// Deletes a company based on the provided company ID.
+    /// </summary>
+    /// <param name="companyId">The ID of the company to delete.</param>
+    /// <param name="trackChanges">Indicates whether to track changes to the entity in the database context.</param>
+    void DeleteCompany(string companyId, bool trackChanges);
 }
