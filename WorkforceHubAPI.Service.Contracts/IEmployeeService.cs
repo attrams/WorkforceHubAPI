@@ -42,4 +42,14 @@ public interface IEmployeeService
     /// <param name="employeeId">The ID of the employee to delete.</param>
     /// <param name="trackChanges">Flag indicating whether changes to the employee entity should be tracked.</param>
     void DeleteEmployeeForCompany(string companyId, string employeeId, bool trackChanges);
+
+    /// <summary>
+    /// Updates an existing employee for a specific company.
+    /// </summary>
+    /// <param name="companyId">The unique identifier of the company to which the employee belongs.</param>
+    /// <param name="employeeId">The unique identifier of the employee to update.</param>
+    /// <param name="employeeForUpdate">The data transfer object containing the updated employee information.</param>
+    /// <param name="trackCompanyChanges">A flag indicating whether to track changes to the company's data during the update process.</param>
+    /// <param name="trackEmployeeChanges">A flag indicating whether to track changes to the employee's data during the update process.</param>
+    void UpdateEmployeeForCompany(string companyId, string employeeId, EmployeeForUpdateDto employeeForUpdate, bool trackCompanyChanges, bool trackEmployeeChanges);
 }

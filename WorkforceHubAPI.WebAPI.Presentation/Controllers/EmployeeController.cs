@@ -62,11 +62,26 @@ public class EmployeeController : ControllerBase
     /// </summary>
     /// <param name="companyId">The ID of the company that employee belongs to.</param>
     /// <param name="employeeId">The ID of the employee to delete.</param>
-    /// <returns>NoContent if the deletion is successful; otherwise, throws an exception.</returns>
+    /// <returns>Returns 204 No Content response if the deletion is successful; otherwise, throws an exception.</returns>
     [HttpDelete("{employeeId}")]
     public IActionResult DeleteEmployeeForCompany(string companyId, string employeeId)
     {
         _service.EmployeeService.DeleteEmployeeForCompany(companyId, employeeId, trackChanges: false);
+
+        return NoContent();
+    }
+
+    /// <summary>
+    /// Updates an existing employee for a specific company.
+    /// </summary>
+    /// <param name="companyId">The unique identifier of the company to which the employee belongs to.</param>
+    /// <param name="employeeId">The unique identifier of the employee to update.</param>
+    /// <param name="employee">The data transfer object containing updated employee information.</param>
+    /// <returns>Returns a 204 No Content response if the employee is successfully updated.</returns>
+    [HttpPut("{employeeId}")]
+    public IActionResult UpdateEmployeeForCompany(string companyId, string employeeId, [FromBody] EmployeeForUpdateDto employee)
+    {
+        _service.EmployeeService.UpdateEmployeeForCompany(companyId, employeeId, employee, trackCompanyChanges: false, trackEmployeeChanges: true);
 
         return NoContent();
     }
