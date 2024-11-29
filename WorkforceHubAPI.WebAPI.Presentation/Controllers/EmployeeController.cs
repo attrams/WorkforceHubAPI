@@ -56,4 +56,18 @@ public class EmployeeController : ControllerBase
         // Return the newly created employee with a route to access it, along with a 201 status code.
         return CreatedAtRoute("GetEmployeeForCompany", new { companyId, employeeId = employeeToReturn.Id }, employeeToReturn);
     }
+
+    /// <summary>
+    /// Handles the HTTP DELETE request to delete an employee for a specific company.
+    /// </summary>
+    /// <param name="companyId">The ID of the company that employee belongs to.</param>
+    /// <param name="employeeId">The ID of the employee to delete.</param>
+    /// <returns>NoContent if the deletion is successful; otherwise, throws an exception.</returns>
+    [HttpDelete("{employeeId}")]
+    public IActionResult DeleteEmployeeForCompany(string companyId, string employeeId)
+    {
+        _service.EmployeeService.DeleteEmployeeForCompany(companyId, employeeId, trackChanges: false);
+
+        return NoContent();
+    }
 }

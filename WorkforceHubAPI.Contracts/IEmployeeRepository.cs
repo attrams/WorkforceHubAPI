@@ -39,4 +39,10 @@ public interface IEmployeeRepository
     /// <param name="companyId">The unique identifier of the company to which the employee will belong to.</param>
     /// <param name="employee">The employee entity to be created.</param>
     void CreateEmployeeForCompany(Guid companyId, Employee employee);
+
+    /// <summary>
+    /// Deletes an employee from the repository.
+    /// </summary>
+    /// <param name="employee">The employee to delete.</param>
+    void DeleteEmployee(Employee employee);
 }

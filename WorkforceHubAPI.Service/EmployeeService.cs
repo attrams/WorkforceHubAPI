@@ -136,4 +136,38 @@ internal sealed class EmployeeService : IEmployeeService
 
         return employeeToReturn;
     }
+
+    /// <inheritdoc/>
+    /// <exception cref="InvalidIdFormatException">
+    /// Exception thrown if the <paramref name="companyId"/> or <paramref name="employeeId"/> is not in a valid format.
+    /// </exception>
+    /// <exception cref="CompanyNotFoundException">Exception thrown when the specified company is not found in the database.</exception>
+    /// <exception cref="EmployeeNotFoundException">Exception thrown when the specified employee is not found in the database.</exception>
+    public void DeleteEmployeeForCompany(string companyId, string employeeId, bool trackChanges)
+    {
+        if (!Guid.TryParse(companyId, out var parsedCompanyId))
+        {
+            throw new InvalidIdFormatException($"The company with id: {companyId} doesn't exist in the database.");
+        }
+
+        if (!Guid.TryParse(employeeId, out var parsedEmployeeId))
+        {
+            throw new InvalidIdFormatException($"The employee with id: {employeeId} doesn't exist in the database.");
+        }
+
+        var company = _repository.Company.GetCompany(parsedCompanyId, trackChanges);
+        if (company is null)
+        {
+            throw new CompanyNotFoundException(parsedCompanyId);
+        }
+
+        var employeeForCompany = _repository.Employee.GetEmployee(parsedCompanyId, parsedEmployeeId, trackChanges);
+        if (employeeForCompany is null)
+        {
+            throw new EmployeeNotFoundException(parsedEmployeeId);
+        }
+
+        _repository.Employee.DeleteEmployee(employeeForCompany);
+        _repository.Save();
+    }
 }

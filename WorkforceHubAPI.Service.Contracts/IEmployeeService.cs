@@ -33,4 +33,13 @@ public interface IEmployeeService
     /// <param name="trackChanges">A flag indicating whether to track changes on the retrieved company entity.</param>
     /// <returns>A data transfer object representing the created employee.</returns>
     EmployeeDto CreateEmployeeForCompany(string companyId, EmployeeForCreationDto employeeForCreation, bool trackChanges);
+
+    /// <summary>
+    /// Deletes an employee for a specific company. Validates the company and employee IDs, and ensure they exist before
+    /// attempting to delete the employee.
+    /// </summary>
+    /// <param name="companyId">The ID of the company that the employee belongs to.</param>
+    /// <param name="employeeId">The ID of the employee to delete.</param>
+    /// <param name="trackChanges">Flag indicating whether changes to the employee entity should be tracked.</param>
+    void DeleteEmployeeForCompany(string companyId, string employeeId, bool trackChanges);
 }

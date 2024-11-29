@@ -61,4 +61,14 @@ public class EmployeeRepository : RepositoryBase<Employee>, IEmployeeRepository
         // Use the base repository 'Create' method to add the employee entity to the database.
         Create(employee);
     }
+
+    /// <summary>
+    /// Deletes the specified employee from the repository.
+    /// </summary>
+    /// <param name="employee">The employee to delete.</param>
+    public void DeleteEmployee(Employee employee)
+    {
+        // Use the base repository 'Delete' method to remove the employee entity to the database.
+        Delete(employee);
+    }
 }
