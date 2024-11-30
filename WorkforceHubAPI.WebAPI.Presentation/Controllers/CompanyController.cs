@@ -121,4 +121,20 @@ public class CompanyController : ControllerBase
 
         return NoContent();
     }
+
+    /// <summary>
+    /// Updates an existing company's details based on the provided company ID and update data.
+    /// </summary>
+    /// <param name="companyId">The unique identifier of the company to update.</param>
+    /// <param name="company">
+    /// An object containing the updated details of the company, including optional updates to associated employees.
+    /// </param>
+    /// <returns>Returns a <see cref="NoContentResult"/> if the update operation is successful.</returns>
+    [HttpPut("{companyId}")]
+    public IActionResult UpdateCompany(string companyId, [FromBody] CompanyForUpdateDto company)
+    {
+        _service.CompanyService.UpdateCompany(companyId, company, trackChanges: true);
+
+        return NoContent();
+    }
 }

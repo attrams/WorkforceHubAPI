@@ -204,4 +204,30 @@ internal sealed class CompanyService : ICompanyService
         _repository.Company.DeleteCompany(company);
         _repository.Save();
     }
+
+    /// <inheritdoc/>
+    /// <exception cref="BadRequestException">Thrown when the <see cref="CompanyForUpdateDto"/> is null.</exception>
+    /// <exception cref="InvalidIdFormatException">Thrown when the provided company ID is not a valid GUID format.</exception>
+    /// <exception cref="CompanyNotFoundException">Thrown when no company is found for the provided ID.</exception>
+    public void UpdateCompany(string companyId, CompanyForUpdateDto companyForUpdate, bool trackChanges)
+    {
+        if (companyForUpdate is null)
+        {
+            throw new BadRequestException("CompanyForUpdateDto object is null.");
+        }
+
+        if (!Guid.TryParse(companyId, out var parsedCompanyId))
+        {
+            throw new InvalidIdFormatException($"The company with id: {companyId} doesn't exist.");
+        }
+
+        var companyEntity = _repository.Company.GetCompany(parsedCompanyId, trackChanges);
+        if (companyEntity is null)
+        {
+            throw new CompanyNotFoundException(parsedCompanyId);
+        }
+
+        _mapper.Map(companyForUpdate, companyEntity);
+        _repository.Save();
+    }
 }

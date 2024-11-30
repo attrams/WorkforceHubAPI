@@ -63,4 +63,15 @@ public interface ICompanyService
     /// <param name="companyId">The ID of the company to delete.</param>
     /// <param name="trackChanges">Indicates whether to track changes to the entity in the database context.</param>
     void DeleteCompany(string companyId, bool trackChanges);
+
+    /// <summary>
+    /// Updates the details of an existing company based on the provided ID and the data transfer object.
+    /// </summary>
+    /// <param name="companyId">The unique identifier of the company to update.</param>
+    /// <param name="companyForUpdate">An object containing the updated details of the company.</param>
+    /// <param name="trackChanges">
+    /// A boolean value indicating whether to track changes to the company entity during the update.
+    /// Set to true for updates involving tracked entities, false otherwise.
+    /// </param>
+    void UpdateCompany(string companyId, CompanyForUpdateDto companyForUpdate, bool trackChanges);
 }
