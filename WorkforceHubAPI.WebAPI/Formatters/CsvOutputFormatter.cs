@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Mvc.Formatters;
 using Microsoft.Net.Http.Headers;
 using WorkforceHubAPI.Shared.DataTransferObjects;
 
-namespace WorkforceHubAPI.WebAPI;
+namespace WorkforceHubAPI.WebAPI.Formatters;
 
 /// <summary>
 /// Custom output formatter for CSV responses.

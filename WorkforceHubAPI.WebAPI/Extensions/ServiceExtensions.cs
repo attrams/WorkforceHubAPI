@@ -4,6 +4,7 @@ using WorkforceHubAPI.LoggerService;
 using WorkforceHubAPI.Repository;
 using WorkforceHubAPI.Service;
 using WorkforceHubAPI.Service.Contracts;
+using WorkforceHubAPI.WebAPI.Formatters;
 
 namespace WorkforceHubAPI.WebAPI.Extensions;
 

@@ -1,9 +1,12 @@
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Formatters;
+using Microsoft.Extensions.Options;
 using Serilog;
 using WorkforceHubAPI.Contracts;
 using WorkforceHubAPI.WebAPI;
 using WorkforceHubAPI.WebAPI.Extensions;
+using WorkforceHubAPI.WebAPI.Formatters;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -60,6 +63,7 @@ builder
     {
         config.RespectBrowserAcceptHeader = true;
         config.ReturnHttpNotAcceptable = true;
+        config.InputFormatters.Insert(0, JsonPatchInputFormatter.GetJsonPatchInputFormatter());
     })
     .AddXmlDataContractSerializerFormatters()
     .AddCustomCSVFormatter()
