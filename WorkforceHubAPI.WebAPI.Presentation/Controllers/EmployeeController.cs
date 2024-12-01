@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 using WorkforceHubAPI.Service.Contracts;
 using WorkforceHubAPI.Shared.DataTransferObjects;
@@ -82,6 +83,29 @@ public class EmployeeController : ControllerBase
     public IActionResult UpdateEmployeeForCompany(string companyId, string employeeId, [FromBody] EmployeeForUpdateDto employee)
     {
         _service.EmployeeService.UpdateEmployeeForCompany(companyId, employeeId, employee, trackCompanyChanges: false, trackEmployeeChanges: true);
+
+        return NoContent();
+    }
+
+    /// <summary>
+    /// Partially updates an employee for a specific company using a JSON Patch document.
+    /// </summary>
+    /// <param name="companyId">The ID of the company the employee belongs to.</param>
+    /// <param name="employeeId">The ID of the employee to update.</param>
+    /// <param name="patchDocument">The JSON Patch document containing the changes.</param>
+    /// <returns>A 204 No Content response if the update is successful or a `BadRequest` response if the patch document is null.</returns>
+    [HttpPatch("{employeeId}")]
+    public IActionResult PartiallyUpdateEmployeeForCompany(string companyId, string employeeId, [FromBody] JsonPatchDocument<EmployeeForUpdateDto> patchDocument)
+    {
+        if (patchDocument is null)
+        {
+            return BadRequest("Patch Document sent from client is null.");
+        }
+
+        var result = _service.EmployeeService.GetEmployeeForPatch(companyId, employeeId, trackCompanyChanges: false, trackEmployeeChanges: true);
+        patchDocument.ApplyTo(result.employeeToPatch);
+
+        _service.EmployeeService.SaveChangesForPatch(result.employeeToPatch, result.employeeEntity);
 
         return NoContent();
     }

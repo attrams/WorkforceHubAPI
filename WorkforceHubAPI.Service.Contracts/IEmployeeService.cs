@@ -1,3 +1,4 @@
+using WorkforceHubAPI.Entities.Models;
 using WorkforceHubAPI.Shared.DataTransferObjects;
 
 namespace WorkforceHubAPI.Service.Contracts;
@@ -52,4 +53,21 @@ public interface IEmployeeService
     /// <param name="trackCompanyChanges">A flag indicating whether to track changes to the company's data during the update process.</param>
     /// <param name="trackEmployeeChanges">A flag indicating whether to track changes to the employee's data during the update process.</param>
     void UpdateEmployeeForCompany(string companyId, string employeeId, EmployeeForUpdateDto employeeForUpdate, bool trackCompanyChanges, bool trackEmployeeChanges);
+
+    /// <summary>
+    /// Retrieves an employee entity and its corresponding data transfer object for partial updates.
+    /// </summary>
+    /// <param name="companyId">The unique identifier of the company to which the employee belongs to.</param>
+    /// <param name="employeeId">The unique identifier of the employee to update.</param>
+    /// <param name="trackCompanyChanges">Indicates whether to track changes to the company entity.</param>
+    /// <param name="trackEmployeeChanges">Indicates whether to track changes to the employee entity.</param>
+    /// <returns>A tuple containing the <see cref="EmployeeForUpdateDto"/> for the patch operation and the original <see cref="Employee"/> entity.</returns>
+    (EmployeeForUpdateDto employeeToPatch, Employee employeeEntity) GetEmployeeForPatch(string companyId, string employeeId, bool trackCompanyChanges, bool trackEmployeeChanges);
+
+    /// <summary>
+    /// Saves the changes made to the employee after applying the patch document.
+    /// </summary>
+    /// <param name="employeeToPatch">The data transfer object containing the updated employee data.</param>
+    /// <param name="employeeEntity">The original employee entity.</param>
+    void SaveChangesForPatch(EmployeeForUpdateDto employeeToPatch, Employee employeeEntity);
 }

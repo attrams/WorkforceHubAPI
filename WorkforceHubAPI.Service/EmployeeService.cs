@@ -44,13 +44,7 @@ internal sealed class EmployeeService : IEmployeeService
             throw new InvalidIdFormatException($"The company with id: {companyId} doesn't exist in the database.");
         }
 
-        var company = _repository.Company.GetCompany(parsedId, trackChanges);
-
-        if (company is null)
-        {
-            throw new CompanyNotFoundException(parsedId);
-        }
-
+        var company = _repository.Company.GetCompany(parsedId, trackChanges) ?? throw new CompanyNotFoundException(parsedId);
         var employeesFromDb = _repository.Employee.GetEmployees(parsedId, trackChanges);
         var employeesDto = _mapper.Map<IEnumerable<EmployeeDto>>(employeesFromDb);
 
@@ -79,20 +73,8 @@ internal sealed class EmployeeService : IEmployeeService
             throw new InvalidIdFormatException($"The employee with id: {employeeId} doesn't exist in the database.");
         }
 
-        var company = _repository.Company.GetCompany(parsedCompanyId, trackChanges);
-
-        if (company is null)
-        {
-            throw new CompanyNotFoundException(parsedCompanyId);
-        }
-
-        var employeeDb = _repository.Employee.GetEmployee(parsedCompanyId, parsedEmployeeId, trackChanges);
-
-        if (employeeDb is null)
-        {
-            throw new EmployeeNotFoundException(parsedEmployeeId);
-        }
-
+        var company = _repository.Company.GetCompany(parsedCompanyId, trackChanges) ?? throw new CompanyNotFoundException(parsedCompanyId);
+        var employeeDb = _repository.Employee.GetEmployee(parsedCompanyId, parsedEmployeeId, trackChanges) ?? throw new EmployeeNotFoundException(parsedEmployeeId);
         var employee = _mapper.Map<EmployeeDto>(employeeDb);
 
         return employee;
@@ -120,13 +102,7 @@ internal sealed class EmployeeService : IEmployeeService
             throw new InvalidIdFormatException($"The company with id: {companyId} doesn't exist in the database.");
         }
 
-        var company = _repository.Company.GetCompany(parsedCompanyId, trackChanges);
-
-        if (company is null)
-        {
-            throw new CompanyNotFoundException(parsedCompanyId);
-        }
-
+        var company = _repository.Company.GetCompany(parsedCompanyId, trackChanges) ?? throw new CompanyNotFoundException(parsedCompanyId);
         var employeeEntity = _mapper.Map<Employee>(employeeForCreation);
 
         _repository.Employee.CreateEmployeeForCompany(parsedCompanyId, employeeEntity);
@@ -155,17 +131,8 @@ internal sealed class EmployeeService : IEmployeeService
             throw new InvalidIdFormatException($"The employee with id: {employeeId} doesn't exist in the database.");
         }
 
-        var company = _repository.Company.GetCompany(parsedCompanyId, trackChanges);
-        if (company is null)
-        {
-            throw new CompanyNotFoundException(parsedCompanyId);
-        }
-
-        var employeeForCompany = _repository.Employee.GetEmployee(parsedCompanyId, parsedEmployeeId, trackChanges);
-        if (employeeForCompany is null)
-        {
-            throw new EmployeeNotFoundException(parsedEmployeeId);
-        }
+        var company = _repository.Company.GetCompany(parsedCompanyId, trackChanges) ?? throw new CompanyNotFoundException(parsedCompanyId);
+        var employeeForCompany = _repository.Employee.GetEmployee(parsedCompanyId, parsedEmployeeId, trackChanges) ?? throw new EmployeeNotFoundException(parsedEmployeeId);
 
         _repository.Employee.DeleteEmployee(employeeForCompany);
         _repository.Save();
@@ -191,19 +158,40 @@ internal sealed class EmployeeService : IEmployeeService
             throw new BadRequestException("EmployeeForUpdateDto is null");
         }
 
-        var company = _repository.Company.GetCompany(parsedCompanyId, trackCompanyChanges);
-        if (company is null)
-        {
-            throw new CompanyNotFoundException(parsedCompanyId);
-        }
-
-        var employeeEntity = _repository.Employee.GetEmployee(parsedCompanyId, parsedEmployeeId, trackEmployeeChanges);
-        if (employeeEntity is null)
-        {
-            throw new EmployeeNotFoundException(parsedEmployeeId);
-        }
+        var company = _repository.Company.GetCompany(parsedCompanyId, trackCompanyChanges) ?? throw new CompanyNotFoundException(parsedCompanyId);
+        var employeeEntity = _repository.Employee.GetEmployee(parsedCompanyId, parsedEmployeeId, trackEmployeeChanges) ?? throw new EmployeeNotFoundException(parsedEmployeeId);
 
         _mapper.Map(employeeForUpdate, employeeEntity);
+        _repository.Save();
+    }
+
+    /// <inheritdoc/>
+    /// <exception cref="InvalidIdFormatException">Thrown when the company or employee ID is not valid.</exception>
+    /// <exception cref="CompanyNotFoundException">Thrown if the specified company is not found.</exception>
+    /// <exception cref="EmployeeNotFoundException">Thrown if the specified employee is not found.</exception>
+    public (EmployeeForUpdateDto employeeToPatch, Employee employeeEntity) GetEmployeeForPatch(string companyId, string employeeId, bool trackCompanyChanges, bool trackEmployeeChanges)
+    {
+        if (!Guid.TryParse(companyId, out var parsedCompanyId))
+        {
+            throw new InvalidIdFormatException($"The company with id: {companyId} doesn't exist in the database.");
+        }
+        if (!Guid.TryParse(employeeId, out var parsedEmployeeId))
+        {
+            throw new InvalidIdFormatException($"The employee with id: {employeeId} doesn't exist in the database.");
+        }
+
+        var company = _repository.Company.GetCompany(parsedCompanyId, trackCompanyChanges) ?? throw new CompanyNotFoundException(parsedCompanyId);
+        var employeeEntity = _repository.Employee.GetEmployee(parsedCompanyId, parsedEmployeeId, trackEmployeeChanges) ?? throw new EmployeeNotFoundException(parsedEmployeeId);
+        var employeeToPatch = _mapper.Map<EmployeeForUpdateDto>(employeeEntity);
+
+        return (employeeToPatch, employeeEntity);
+    }
+
+    /// <inheritdoc/>
+    public void SaveChangesForPatch(EmployeeForUpdateDto employeeToPatch, Employee employeeEntity)
+    {
+        _mapper.Map(employeeToPatch, employeeEntity);
+
         _repository.Save();
     }
 }

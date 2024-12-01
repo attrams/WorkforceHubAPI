@@ -36,7 +36,7 @@ public class MappingProfile : Profile
         CreateMap<EmployeeForCreationDto, Employee>();
 
         // Configures the mapping between EmployeeForUpdateDto and Employee entity.
-        CreateMap<EmployeeForUpdateDto, Employee>();
+        CreateMap<EmployeeForUpdateDto, Employee>().ReverseMap();
 
         // Configures the mapping between CompanyForUpdateDto and Company entity.
         CreateMap<CompanyForUpdateDto, Company>();
