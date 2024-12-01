@@ -1,6 +1,0 @@
-@WorkforceHubAPI.WebAPI_HostAddress = http://localhost:5012
-
-GET {{WorkforceHubAPI.WebAPI_HostAddress}}/weatherforecast/
-Accept: application/json
-
-###

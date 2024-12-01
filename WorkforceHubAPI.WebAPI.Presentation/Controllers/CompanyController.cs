@@ -83,6 +83,11 @@ public class CompanyController : ControllerBase
     [HttpPost]
     public IActionResult CreateCompany([FromBody] CompanyForCreationDto company)
     {
+        if (!ModelState.IsValid)
+        {
+            return UnprocessableEntity(ModelState);
+        }
+
         var createdCompany = _service.CompanyService.CreateCompany(company);
 
         // Return the created company with the appropriate route for retrieving it.
@@ -133,6 +138,10 @@ public class CompanyController : ControllerBase
     [HttpPut("{companyId}")]
     public IActionResult UpdateCompany(string companyId, [FromBody] CompanyForUpdateDto company)
     {
+        if (!ModelState.IsValid)
+        {
+            return UnprocessableEntity(ModelState);
+        }
         _service.CompanyService.UpdateCompany(companyId, company, trackChanges: true);
 
         return NoContent();

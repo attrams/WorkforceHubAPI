@@ -8,7 +8,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="8.0.8" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="9.0.0">
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
@@ -18,10 +17,12 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\WorkforceHubAPI.LoggerService\WorkforceHubAPI.LoggerService.csproj" />
+    <ProjectReference
+      Include="..\WorkforceHubAPI.LoggerService\WorkforceHubAPI.LoggerService.csproj" />
     <ProjectReference Include="..\WorkforceHubAPI.Repository\WorkforceHubAPI.Repository.csproj" />
     <ProjectReference Include="..\WorkforceHubAPI.Service\WorkforceHubAPI.Service.csproj" />
-    <ProjectReference Include="..\WorkforceHubAPI.WebAPI.Presentation\WorkforceHubAPI.WebAPI.Presentation.csproj" />
+    <ProjectReference
+      Include="..\WorkforceHubAPI.WebAPI.Presentation\WorkforceHubAPI.WebAPI.Presentation.csproj" />
   </ItemGroup>
 
 </Project>

@@ -52,6 +52,10 @@ public class EmployeeController : ControllerBase
     [HttpPost]
     public IActionResult CreateEmployeeForCompany(string companyId, [FromBody] EmployeeForCreationDto employee)
     {
+        if (!ModelState.IsValid)
+        {
+            return UnprocessableEntity(ModelState);
+        }
         var employeeToReturn = _service.EmployeeService.CreateEmployeeForCompany(companyId, employee, trackChanges: false);
 
         // Return the newly created employee with a route to access it, along with a 201 status code.
@@ -82,6 +86,11 @@ public class EmployeeController : ControllerBase
     [HttpPut("{employeeId}")]
     public IActionResult UpdateEmployeeForCompany(string companyId, string employeeId, [FromBody] EmployeeForUpdateDto employee)
     {
+        if (!ModelState.IsValid)
+        {
+            return UnprocessableEntity(ModelState);
+        }
+
         _service.EmployeeService.UpdateEmployeeForCompany(companyId, employeeId, employee, trackCompanyChanges: false, trackEmployeeChanges: true);
 
         return NoContent();
@@ -103,7 +112,13 @@ public class EmployeeController : ControllerBase
         }
 
         var result = _service.EmployeeService.GetEmployeeForPatch(companyId, employeeId, trackCompanyChanges: false, trackEmployeeChanges: true);
-        patchDocument.ApplyTo(result.employeeToPatch);
+        patchDocument.ApplyTo(result.employeeToPatch, ModelState);
+        TryValidateModel(result.employeeToPatch);
+
+        if (!ModelState.IsValid)
+        {
+            return UnprocessableEntity(ModelState);
+        }
 
         _service.EmployeeService.SaveChangesForPatch(result.employeeToPatch, result.employeeEntity);
 
