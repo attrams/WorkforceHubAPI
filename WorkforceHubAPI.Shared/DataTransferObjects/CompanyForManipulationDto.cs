@@ -22,7 +22,7 @@ public abstract record CompanyForManipulationDto
     /// Gets or initializes the address of the company.
     /// </summary>
     /// <remarks>
-    /// This field is required and must no exceed 60 characters.
+    /// This field is required and must not exceed 60 characters.
     /// </remarks>
     [Required(ErrorMessage = "Company address is a required field.")]
     [MaxLength(60, ErrorMessage = "Maximum length for the Address is 60 characters.")]
@@ -32,8 +32,10 @@ public abstract record CompanyForManipulationDto
     /// Gets or initializes the country the company is located.
     /// </summary>
     /// <remarks>
-    /// This field is optional.
+    /// This field is required and must not exceed 70 characters.
     /// </remarks>
+    [Required(ErrorMessage = "Company country is a required field.")]
+    [MaxLength(70, ErrorMessage = "Maximum length for the Country is 70 characters.")]
     public string? Country { get; init; }
 
     /// <summary>

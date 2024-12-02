@@ -37,6 +37,11 @@ public class Company
     /// <summary>
     /// Gets or sets the country where the company is located.
     /// </summary>
+    /// <remarks>
+    /// This field is required and has a maximum length of 70 characters.
+    /// </remarks>
+    [Required(ErrorMessage = "Company country is a required field.")]
+    [MaxLength(70, ErrorMessage = "Maximum length for the Country is 70 characters.")]
     public string? Country { get; set; }
 
     /// <summary>
