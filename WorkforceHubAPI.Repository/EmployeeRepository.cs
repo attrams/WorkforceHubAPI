@@ -1,3 +1,4 @@
+using Microsoft.EntityFrameworkCore;
 using WorkforceHubAPI.Contracts;
 using WorkforceHubAPI.Entities.Models;
 
@@ -24,11 +25,11 @@ public class EmployeeRepository : RepositoryBase<Employee>, IEmployeeRepository
     /// <returns>
     /// A collection of all the employees with the provided company identifier.
     /// </returns>
-    public IEnumerable<Employee> GetEmployees(Guid companyId, bool trackChanges)
+    public async Task<IEnumerable<Employee>> GetEmployeesAsync(Guid companyId, bool trackChanges)
     {
-        return FindByCondition(
+        return await FindByCondition(
             employee => employee.CompanyId.Equals(companyId), trackChanges
-        ).OrderBy(employee => employee.Name).ToList();
+        ).OrderBy(employee => employee.Name).ToListAsync();
     }
 
     /// <summary>
@@ -41,11 +42,11 @@ public class EmployeeRepository : RepositoryBase<Employee>, IEmployeeRepository
     /// The employee entity with the specified identifier from the company with the identifier provided, or null if
     /// no match is found.
     /// </returns>
-    public Employee? GetEmployee(Guid companyId, Guid employeeId, bool trackChanges)
+    public async Task<Employee?> GetEmployeeAsync(Guid companyId, Guid employeeId, bool trackChanges)
     {
-        return FindByCondition(
+        return await FindByCondition(
             employee => employee.CompanyId.Equals(companyId) && employee.Id.Equals(employeeId), trackChanges
-        ).SingleOrDefault();
+        ).SingleOrDefaultAsync();
     }
 
     /// <summary>

@@ -37,15 +37,15 @@ internal sealed class EmployeeService : IEmployeeService
     /// <returns>A collection of EmployeeDto representing employees of the specified company.</returns>
     /// <exception cref="InvalidIdFormatException">Thrown when the company ID is not in a valid format.</exception>
     /// <exception cref="CompanyNotFoundException">Thrown when the company with the given ID does not exist.</exception>
-    public IEnumerable<EmployeeDto> GetEmployees(string companyId, bool trackChanges)
+    public async Task<IEnumerable<EmployeeDto>> GetEmployeesAsync(string companyId, bool trackChanges)
     {
         if (!Guid.TryParse(companyId, out var parsedId))
         {
             throw new InvalidIdFormatException($"The company with id: {companyId} doesn't exist in the database.");
         }
 
-        var company = _repository.Company.GetCompany(parsedId, trackChanges) ?? throw new CompanyNotFoundException(parsedId);
-        var employeesFromDb = _repository.Employee.GetEmployees(parsedId, trackChanges);
+        var company = await _repository.Company.GetCompanyAsync(parsedId, trackChanges) ?? throw new CompanyNotFoundException(parsedId);
+        var employeesFromDb = await _repository.Employee.GetEmployeesAsync(parsedId, trackChanges);
         var employeesDto = _mapper.Map<IEnumerable<EmployeeDto>>(employeesFromDb);
 
         return employeesDto;
@@ -61,7 +61,7 @@ internal sealed class EmployeeService : IEmployeeService
     /// <exception cref="InvalidIdFormatException">Thrown when the company or employee ID is not in a valid format.</exception>
     /// <exception cref="CompanyNotFoundException">Thrown when the company with the given ID does not exist.</exception>
     /// <exception cref="EmployeeNotFoundException">Thrown when the employee with the given ID does not exist.</exception>
-    public EmployeeDto GetEmployee(string companyId, string employeeId, bool trackChanges)
+    public async Task<EmployeeDto> GetEmployeeAsync(string companyId, string employeeId, bool trackChanges)
     {
         if (!Guid.TryParse(companyId, out var parsedCompanyId))
         {
@@ -73,8 +73,8 @@ internal sealed class EmployeeService : IEmployeeService
             throw new InvalidIdFormatException($"The employee with id: {employeeId} doesn't exist in the database.");
         }
 
-        var company = _repository.Company.GetCompany(parsedCompanyId, trackChanges) ?? throw new CompanyNotFoundException(parsedCompanyId);
-        var employeeDb = _repository.Employee.GetEmployee(parsedCompanyId, parsedEmployeeId, trackChanges) ?? throw new EmployeeNotFoundException(parsedEmployeeId);
+        var company = await _repository.Company.GetCompanyAsync(parsedCompanyId, trackChanges) ?? throw new CompanyNotFoundException(parsedCompanyId);
+        var employeeDb = await _repository.Employee.GetEmployeeAsync(parsedCompanyId, parsedEmployeeId, trackChanges) ?? throw new EmployeeNotFoundException(parsedEmployeeId);
         var employee = _mapper.Map<EmployeeDto>(employeeDb);
 
         return employee;
@@ -90,7 +90,7 @@ internal sealed class EmployeeService : IEmployeeService
     /// <exception cref="BadRequestException">Thrown when the <paramref name="employeeForCreation"/> is null.</exception>
     /// <exception cref="InvalidIdFormatException">Thrown when the <paramref name="companyId"/> is not in a valid format.</exception>
     /// <exception cref="CompanyNotFoundException">Thrown when the specified company is not found in the database.</exception>
-    public EmployeeDto CreateEmployeeForCompany(string companyId, EmployeeForCreationDto employeeForCreation, bool trackChanges)
+    public async Task<EmployeeDto> CreateEmployeeForCompanyAsync(string companyId, EmployeeForCreationDto employeeForCreation, bool trackChanges)
     {
         if (employeeForCreation is null)
         {
@@ -102,11 +102,11 @@ internal sealed class EmployeeService : IEmployeeService
             throw new InvalidIdFormatException($"The company with id: {companyId} doesn't exist in the database.");
         }
 
-        var company = _repository.Company.GetCompany(parsedCompanyId, trackChanges) ?? throw new CompanyNotFoundException(parsedCompanyId);
+        var company = await _repository.Company.GetCompanyAsync(parsedCompanyId, trackChanges) ?? throw new CompanyNotFoundException(parsedCompanyId);
         var employeeEntity = _mapper.Map<Employee>(employeeForCreation);
 
         _repository.Employee.CreateEmployeeForCompany(parsedCompanyId, employeeEntity);
-        _repository.Save();
+        await _repository.SaveAsync();
 
         var employeeToReturn = _mapper.Map<EmployeeDto>(employeeEntity);
 
@@ -119,7 +119,7 @@ internal sealed class EmployeeService : IEmployeeService
     /// </exception>
     /// <exception cref="CompanyNotFoundException">Exception thrown when the specified company is not found in the database.</exception>
     /// <exception cref="EmployeeNotFoundException">Exception thrown when the specified employee is not found in the database.</exception>
-    public void DeleteEmployeeForCompany(string companyId, string employeeId, bool trackChanges)
+    public async Task DeleteEmployeeForCompanyAsync(string companyId, string employeeId, bool trackChanges)
     {
         if (!Guid.TryParse(companyId, out var parsedCompanyId))
         {
@@ -131,11 +131,11 @@ internal sealed class EmployeeService : IEmployeeService
             throw new InvalidIdFormatException($"The employee with id: {employeeId} doesn't exist in the database.");
         }
 
-        var company = _repository.Company.GetCompany(parsedCompanyId, trackChanges) ?? throw new CompanyNotFoundException(parsedCompanyId);
-        var employeeForCompany = _repository.Employee.GetEmployee(parsedCompanyId, parsedEmployeeId, trackChanges) ?? throw new EmployeeNotFoundException(parsedEmployeeId);
+        var company = await _repository.Company.GetCompanyAsync(parsedCompanyId, trackChanges) ?? throw new CompanyNotFoundException(parsedCompanyId);
+        var employeeForCompany = await _repository.Employee.GetEmployeeAsync(parsedCompanyId, parsedEmployeeId, trackChanges) ?? throw new EmployeeNotFoundException(parsedEmployeeId);
 
         _repository.Employee.DeleteEmployee(employeeForCompany);
-        _repository.Save();
+        await _repository.SaveAsync();
     }
 
     /// <inheritdoc/>
@@ -143,7 +143,7 @@ internal sealed class EmployeeService : IEmployeeService
     /// <exception cref="BadRequestException">Thrown when the <see cref="EmployeeForUpdateDto"/> is null.</exception>
     /// <exception cref="CompanyNotFoundException">Thrown when the specified company cannot be found in the database.</exception>
     /// <exception cref="EmployeeNotFoundException">Thrown when the specified employee cannot be found in the database.</exception>
-    public void UpdateEmployeeForCompany(string companyId, string employeeId, EmployeeForUpdateDto employeeForUpdate, bool trackCompanyChanges, bool trackEmployeeChanges)
+    public async Task UpdateEmployeeForCompanyAsync(string companyId, string employeeId, EmployeeForUpdateDto employeeForUpdate, bool trackCompanyChanges, bool trackEmployeeChanges)
     {
         if (!Guid.TryParse(companyId, out var parsedCompanyId))
         {
@@ -158,18 +158,18 @@ internal sealed class EmployeeService : IEmployeeService
             throw new BadRequestException("EmployeeForUpdateDto is null");
         }
 
-        var company = _repository.Company.GetCompany(parsedCompanyId, trackCompanyChanges) ?? throw new CompanyNotFoundException(parsedCompanyId);
-        var employeeEntity = _repository.Employee.GetEmployee(parsedCompanyId, parsedEmployeeId, trackEmployeeChanges) ?? throw new EmployeeNotFoundException(parsedEmployeeId);
+        var company = await _repository.Company.GetCompanyAsync(parsedCompanyId, trackCompanyChanges) ?? throw new CompanyNotFoundException(parsedCompanyId);
+        var employeeEntity = await _repository.Employee.GetEmployeeAsync(parsedCompanyId, parsedEmployeeId, trackEmployeeChanges) ?? throw new EmployeeNotFoundException(parsedEmployeeId);
 
         _mapper.Map(employeeForUpdate, employeeEntity);
-        _repository.Save();
+        await _repository.SaveAsync();
     }
 
     /// <inheritdoc/>
     /// <exception cref="InvalidIdFormatException">Thrown when the company or employee ID is not valid.</exception>
     /// <exception cref="CompanyNotFoundException">Thrown if the specified company is not found.</exception>
     /// <exception cref="EmployeeNotFoundException">Thrown if the specified employee is not found.</exception>
-    public (EmployeeForUpdateDto employeeToPatch, Employee employeeEntity) GetEmployeeForPatch(string companyId, string employeeId, bool trackCompanyChanges, bool trackEmployeeChanges)
+    public async Task<(EmployeeForUpdateDto employeeToPatch, Employee employeeEntity)> GetEmployeeForPatchAsync(string companyId, string employeeId, bool trackCompanyChanges, bool trackEmployeeChanges)
     {
         if (!Guid.TryParse(companyId, out var parsedCompanyId))
         {
@@ -180,18 +180,18 @@ internal sealed class EmployeeService : IEmployeeService
             throw new InvalidIdFormatException($"The employee with id: {employeeId} doesn't exist in the database.");
         }
 
-        var company = _repository.Company.GetCompany(parsedCompanyId, trackCompanyChanges) ?? throw new CompanyNotFoundException(parsedCompanyId);
-        var employeeEntity = _repository.Employee.GetEmployee(parsedCompanyId, parsedEmployeeId, trackEmployeeChanges) ?? throw new EmployeeNotFoundException(parsedEmployeeId);
+        var company = await _repository.Company.GetCompanyAsync(parsedCompanyId, trackCompanyChanges) ?? throw new CompanyNotFoundException(parsedCompanyId);
+        var employeeEntity = await _repository.Employee.GetEmployeeAsync(parsedCompanyId, parsedEmployeeId, trackEmployeeChanges) ?? throw new EmployeeNotFoundException(parsedEmployeeId);
         var employeeToPatch = _mapper.Map<EmployeeForUpdateDto>(employeeEntity);
 
         return (employeeToPatch, employeeEntity);
     }
 
     /// <inheritdoc/>
-    public void SaveChangesForPatch(EmployeeForUpdateDto employeeToPatch, Employee employeeEntity)
+    public async Task SaveChangesForPatchAsync(EmployeeForUpdateDto employeeToPatch, Employee employeeEntity)
     {
         _mapper.Map(employeeToPatch, employeeEntity);
 
-        _repository.Save();
+        await _repository.SaveAsync();
     }
 }

@@ -36,9 +36,9 @@ public class CompanyController : ControllerBase
     /// This endpoint fetches all companies without tracking changes in the database context.
     /// </remarks>
     [HttpGet]
-    public IActionResult GetCompanies()
+    public async Task<IActionResult> GetCompanies()
     {
-        var companies = _service.CompanyService.GetAllCompanies(trackChanges: false);
+        var companies = await _service.CompanyService.GetAllCompaniesAsync(trackChanges: false);
 
         // Returns a 200 OK response with the list of companies.
         return Ok(companies);
@@ -50,9 +50,9 @@ public class CompanyController : ControllerBase
     /// <param name="id">The unique identifier of the company to retrieve.</param>
     /// <returns>An <see cref="IActionResult"/> containing the company data transfer object (DTO) if found.</returns>
     [HttpGet("{id}", Name = "CompanyById")]
-    public IActionResult GetCompany(string id)
+    public async Task<IActionResult> GetCompany(string id)
     {
-        var company = _service.CompanyService.GetCompany(id, trackChanges: false);
+        var company = await _service.CompanyService.GetCompanyAsync(id, trackChanges: false);
 
         return Ok(company);
     }
@@ -66,9 +66,9 @@ public class CompanyController : ControllerBase
     /// retrieval is successful.
     /// </returns>
     [HttpGet("collection", Name = "CompanyCollection")]
-    public IActionResult GetCompanyCollection([ModelBinder(BinderType = typeof(ArrayModelBinder))] IEnumerable<string> companyIds)
+    public async Task<IActionResult> GetCompanyCollection([ModelBinder(BinderType = typeof(ArrayModelBinder))] IEnumerable<string> companyIds)
     {
-        var companies = _service.CompanyService.GetByIds(companyIds, trackChanges: false);
+        var companies = await _service.CompanyService.GetByIdsAsync(companyIds, trackChanges: false);
 
         return Ok(companies);
     }
@@ -81,14 +81,14 @@ public class CompanyController : ControllerBase
     /// A 201 Created response with the location of the newly created company and its details.
     /// </returns>
     [HttpPost]
-    public IActionResult CreateCompany([FromBody] CompanyForCreationDto company)
+    public async Task<IActionResult> CreateCompany([FromBody] CompanyForCreationDto company)
     {
         if (!ModelState.IsValid)
         {
             return UnprocessableEntity(ModelState);
         }
 
-        var createdCompany = _service.CompanyService.CreateCompany(company);
+        var createdCompany = await _service.CompanyService.CreateCompanyAsync(company);
 
         // Return the created company with the appropriate route for retrieving it.
         return CreatedAtRoute("CompanyById", new { id = createdCompany.Id }, createdCompany);
@@ -106,12 +106,12 @@ public class CompanyController : ControllerBase
     /// - If the provided company collection is null or empty, returns a `400 Bad Request` response.
     /// </returns>
     [HttpPost("collection")]
-    public IActionResult CreateCompanyCollection([FromBody] IEnumerable<CompanyForCreationDto> companyCollection)
+    public async Task<IActionResult> CreateCompanyCollection([FromBody] IEnumerable<CompanyForCreationDto> companyCollection)
     {
-        var result = _service.CompanyService.CreateCompanyCollection(companyCollection);
-        var queryString = new { companyIds = string.Join(",", result.companyIds) };
+        var (companies, companyIds) = await _service.CompanyService.CreateCompanyCollectionAsync(companyCollection);
+        var queryString = new { companyIds = string.Join(",", companyIds) };
 
-        return CreatedAtRoute("CompanyCollection", queryString, result.companies);
+        return CreatedAtRoute("CompanyCollection", queryString, companies);
     }
 
     /// <summary>
@@ -120,9 +120,9 @@ public class CompanyController : ControllerBase
     /// <param name="companyId">The ID of the company to delete.</param>
     /// <returns>A NoContent (204) response if the deletion is successful. </returns>
     [HttpDelete("{companyId}")]
-    public IActionResult DeleteCompany(string companyId)
+    public async Task<IActionResult> DeleteCompany(string companyId)
     {
-        _service.CompanyService.DeleteCompany(companyId, trackChanges: false);
+        await _service.CompanyService.DeleteCompanyAsync(companyId, trackChanges: false);
 
         return NoContent();
     }
@@ -136,13 +136,13 @@ public class CompanyController : ControllerBase
     /// </param>
     /// <returns>Returns a <see cref="NoContentResult"/> if the update operation is successful.</returns>
     [HttpPut("{companyId}")]
-    public IActionResult UpdateCompany(string companyId, [FromBody] CompanyForUpdateDto company)
+    public async Task<IActionResult> UpdateCompany(string companyId, [FromBody] CompanyForUpdateDto company)
     {
         if (!ModelState.IsValid)
         {
             return UnprocessableEntity(ModelState);
         }
-        _service.CompanyService.UpdateCompany(companyId, company, trackChanges: true);
+        await _service.CompanyService.UpdateCompanyAsync(companyId, company, trackChanges: true);
 
         return NoContent();
     }

@@ -39,9 +39,9 @@ internal sealed class CompanyService : ICompanyService
     /// <returns>
     /// A collection of all companies in the database.
     /// </returns>
-    public IEnumerable<CompanyDto> GetAllCompanies(bool trackChanges)
+    public async Task<IEnumerable<CompanyDto>> GetAllCompaniesAsync(bool trackChanges)
     {
-        var companies = _repository.Company.GetAllCompanies(trackChanges);
+        var companies = await _repository.Company.GetAllCompaniesAsync(trackChanges);
 
         var companiesDto = _mapper.Map<IEnumerable<CompanyDto>>(companies);
 
@@ -54,20 +54,14 @@ internal sealed class CompanyService : ICompanyService
     /// <param name="companyId">The unique identifier of the company to retrieve.</param>
     /// <param name="trackChanges">A flag indicating whether to track changes to the retrieved entity.</param>
     /// <returns>A data transfer object (DTO) representing the company with the specified identifier.</returns>
-    public CompanyDto GetCompany(string companyId, bool trackChanges)
+    public async Task<CompanyDto> GetCompanyAsync(string companyId, bool trackChanges)
     {
         if (!Guid.TryParse(companyId, out var parsedId))
         {
             throw new InvalidIdFormatException($"The company with id: {companyId} doesn't exist.");
         }
 
-        var company = _repository.Company.GetCompany(parsedId, trackChanges);
-
-        if (company is null)
-        {
-            throw new CompanyNotFoundException(parsedId);
-        }
-
+        var company = await _repository.Company.GetCompanyAsync(parsedId, trackChanges) ?? throw new CompanyNotFoundException(parsedId);
         var companyDto = _mapper.Map<CompanyDto>(company);
 
         return companyDto;
@@ -86,7 +80,7 @@ internal sealed class CompanyService : ICompanyService
     /// <exception cref="CollectionByIdsBadRequestException">
     /// Thrown when some of the provided IDs are invalid or do not correspond to any existing companies in the database.
     /// </exception>
-    public IEnumerable<CompanyDto> GetByIds(IEnumerable<string> companyIds, bool trackChanges)
+    public async Task<IEnumerable<CompanyDto>> GetByIdsAsync(IEnumerable<string> companyIds, bool trackChanges)
     {
         // Thrown when the company ids is null or empty.
         if (companyIds is null || !companyIds.Any())
@@ -115,7 +109,7 @@ internal sealed class CompanyService : ICompanyService
             throw new CollectionByIdsBadRequestException();
         }
 
-        var companyEntities = _repository.Company.GetByIds(validGuids, trackChanges);
+        var companyEntities = await _repository.Company.GetByIdsAsync(validGuids, trackChanges);
 
         // Thrown when the valid company ids contain id(s) that does not exist.
         if (validGuids.Count() != companyEntities.Count())
@@ -135,7 +129,7 @@ internal sealed class CompanyService : ICompanyService
     /// <param name="company">The data transfer object containing the company details.</param>
     /// <returns>The created company as a <see cref="CompanyDto"/>.</returns>
     /// <exception cref="BadRequestException">Thrown when the provided <see cref="CompanyForCreationDto"/> is null.</exception>
-    public CompanyDto CreateCompany(CompanyForCreationDto company)
+    public async Task<CompanyDto> CreateCompanyAsync(CompanyForCreationDto company)
     {
         if (company is null)
         {
@@ -145,7 +139,7 @@ internal sealed class CompanyService : ICompanyService
         var companyEntity = _mapper.Map<Company>(company);
 
         _repository.Company.CreateCompany(companyEntity);
-        _repository.Save();
+        await _repository.SaveAsync();
 
         var companyToReturn = _mapper.Map<CompanyDto>(companyEntity);
 
@@ -164,7 +158,7 @@ internal sealed class CompanyService : ICompanyService
     /// <exception cref="CompanyCollectionBadRequestException">
     /// Thrown if the provided company collection is null or does not contain any companies.
     /// </exception>
-    public (IEnumerable<CompanyDto> companies, string companyIds) CreateCompanyCollection(IEnumerable<CompanyForCreationDto> companyCollection)
+    public async Task<(IEnumerable<CompanyDto> companies, string companyIds)> CreateCompanyCollectionAsync(IEnumerable<CompanyForCreationDto> companyCollection)
     {
         if (companyCollection is null || !companyCollection.Any())
         {
@@ -177,7 +171,7 @@ internal sealed class CompanyService : ICompanyService
             _repository.Company.CreateCompany(company);
         }
 
-        _repository.Save();
+        await _repository.SaveAsync();
 
         var companyCollectionToReturn = _mapper.Map<IEnumerable<CompanyDto>>(companyEntities);
         var companyIds = string.Join(",", companyCollectionToReturn.Select(company => company.Id));
@@ -188,28 +182,24 @@ internal sealed class CompanyService : ICompanyService
     /// <inheritdoc/>
     /// <exception cref="InvalidIdFormatException">Thrown if the provided company ID is not a valid GUID.</exception>
     /// <exception cref="CompanyNotFoundException">Thrown if the company with the specified ID does not exist.</exception>
-    public void DeleteCompany(string companyId, bool trackChanges)
+    public async Task DeleteCompanyAsync(string companyId, bool trackChanges)
     {
         if (!Guid.TryParse(companyId, out var parsedCompanyId))
         {
             throw new InvalidIdFormatException($"The company with id: {companyId} doesn't exist.");
         }
 
-        var company = _repository.Company.GetCompany(parsedCompanyId, trackChanges);
-        if (company is null)
-        {
-            throw new CompanyNotFoundException(parsedCompanyId);
-        }
+        var company = await _repository.Company.GetCompanyAsync(parsedCompanyId, trackChanges) ?? throw new CompanyNotFoundException(parsedCompanyId);
 
         _repository.Company.DeleteCompany(company);
-        _repository.Save();
+        await _repository.SaveAsync();
     }
 
     /// <inheritdoc/>
     /// <exception cref="BadRequestException">Thrown when the <see cref="CompanyForUpdateDto"/> is null.</exception>
     /// <exception cref="InvalidIdFormatException">Thrown when the provided company ID is not a valid GUID format.</exception>
     /// <exception cref="CompanyNotFoundException">Thrown when no company is found for the provided ID.</exception>
-    public void UpdateCompany(string companyId, CompanyForUpdateDto companyForUpdate, bool trackChanges)
+    public async Task UpdateCompanyAsync(string companyId, CompanyForUpdateDto companyForUpdate, bool trackChanges)
     {
         if (companyForUpdate is null)
         {
@@ -221,13 +211,9 @@ internal sealed class CompanyService : ICompanyService
             throw new InvalidIdFormatException($"The company with id: {companyId} doesn't exist.");
         }
 
-        var companyEntity = _repository.Company.GetCompany(parsedCompanyId, trackChanges);
-        if (companyEntity is null)
-        {
-            throw new CompanyNotFoundException(parsedCompanyId);
-        }
+        var companyEntity = await _repository.Company.GetCompanyAsync(parsedCompanyId, trackChanges) ?? throw new CompanyNotFoundException(parsedCompanyId);
 
         _mapper.Map(companyForUpdate, companyEntity);
-        _repository.Save();
+        await _repository.SaveAsync();
     }
 }

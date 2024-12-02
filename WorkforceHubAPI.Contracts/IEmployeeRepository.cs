@@ -19,7 +19,7 @@ public interface IEmployeeRepository
     /// <returns>
     /// A collection of all the employees with the provided company identifier.
     /// </returns>
-    IEnumerable<Employee> GetEmployees(Guid companyId, bool trackChanges);
+    Task<IEnumerable<Employee>> GetEmployeesAsync(Guid companyId, bool trackChanges);
 
     /// <summary>
     /// Retrieves a specific employee using the provided employee identifier and company identifier.
@@ -31,7 +31,7 @@ public interface IEmployeeRepository
     /// The employee entity with the specified identifier from the company with the identifier provided, or null if
     /// no match is found.
     /// </returns>
-    Employee? GetEmployee(Guid companyId, Guid employeeId, bool trackChanges);
+    Task<Employee?> GetEmployeeAsync(Guid companyId, Guid employeeId, bool trackChanges);
 
     /// <summary>
     /// Adds a new employee to the company with the specified company id.

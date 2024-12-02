@@ -1,3 +1,4 @@
+using Microsoft.EntityFrameworkCore;
 using WorkforceHubAPI.Contracts;
 using WorkforceHubAPI.Entities.Models;
 
@@ -23,9 +24,9 @@ public class CompanyRepository : RepositoryBase<Company>, ICompanyRepository
     /// <returns>
     /// A collection of all companies, ordered by their name.
     /// </returns>
-    public IEnumerable<Company> GetAllCompanies(bool trackChanges)
+    public async Task<IEnumerable<Company>> GetAllCompaniesAsync(bool trackChanges)
     {
-        return FindAll(trackChanges).OrderBy(company => company.Name).ToList();
+        return await FindAll(trackChanges).OrderBy(company => company.Name).ToListAsync();
     }
 
     /// <summary>
@@ -34,9 +35,9 @@ public class CompanyRepository : RepositoryBase<Company>, ICompanyRepository
     /// <param name="companyId">The unique identifier of the company to retrieve.</param>
     /// <param name="trackChanges">A flag indicating whether to track changes to the retrieved entity.</param>
     /// <returns>The company entity with the specified identifier, or null if no match is found.</returns>
-    public Company? GetCompany(Guid companyId, bool trackChanges)
+    public async Task<Company?> GetCompanyAsync(Guid companyId, bool trackChanges)
     {
-        return FindByCondition(company => company.Id.Equals(companyId), trackChanges).SingleOrDefault();
+        return await FindByCondition(company => company.Id.Equals(companyId), trackChanges).SingleOrDefaultAsync();
     }
 
     /// <summary>
@@ -48,9 +49,9 @@ public class CompanyRepository : RepositoryBase<Company>, ICompanyRepository
     /// Set to true to enable tracking; otherwise, false for no tracking.
     /// </param>
     /// <returns>A collection of companies matching the provided IDs.</returns>
-    public IEnumerable<Company> GetByIds(IEnumerable<Guid> companyIds, bool trackChanges)
+    public async Task<IEnumerable<Company>> GetByIdsAsync(IEnumerable<Guid> companyIds, bool trackChanges)
     {
-        return FindByCondition(company => companyIds.Contains(company.Id), trackChanges).ToList();
+        return await FindByCondition(company => companyIds.Contains(company.Id), trackChanges).ToListAsync();
     }
 
     /// <summary>

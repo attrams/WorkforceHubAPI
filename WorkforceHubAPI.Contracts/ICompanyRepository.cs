@@ -18,7 +18,7 @@ public interface ICompanyRepository
     /// <returns>
     /// A collection of all companies in the database.
     /// </returns>
-    IEnumerable<Company> GetAllCompanies(bool trackChanges);
+    Task<IEnumerable<Company>> GetAllCompaniesAsync(bool trackChanges);
 
     /// <summary>
     /// Retrieves a specific company by its unique identifier.
@@ -26,7 +26,7 @@ public interface ICompanyRepository
     /// <param name="companyId">The unique identifier of the company to retrieve.</param>
     /// <param name="trackChanges">A flag indicating whether to track changes to the retrieved entity.</param>
     /// <returns>The company entity with the specified identifier, or null if no match is found.</returns>
-    Company? GetCompany(Guid companyId, bool trackChanges);
+    Task<Company?> GetCompanyAsync(Guid companyId, bool trackChanges);
 
     /// <summary>
     /// Retrieves a collection of companies based on the specified list of company IDs.
@@ -37,7 +37,7 @@ public interface ICompanyRepository
     /// Set to true to enable tracking; otherwise, false for no tracking.
     /// </param>
     /// <returns>A collection of companies matching the provided IDs.</returns>
-    IEnumerable<Company> GetByIds(IEnumerable<Guid> companyIds, bool trackChanges);
+    Task<IEnumerable<Company>> GetByIdsAsync(IEnumerable<Guid> companyIds, bool trackChanges);
 
     /// <summary>
     /// Adds a new company entity.

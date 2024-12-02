@@ -18,5 +18,5 @@ public interface IRepositoryManager
     /// <summary>
     /// Persists all changes made in the repositories to the database.
     /// </summary>
-    void Save();
+    Task SaveAsync();
 }

@@ -51,5 +51,5 @@ public sealed class RepositoryManager : IRepositoryManager
     /// <summary>
     /// Saves all changes made in the context to the database.
     /// </summary>
-    public void Save() => _repositoryContext.SaveChanges();
+    public async Task SaveAsync() => await _repositoryContext.SaveChangesAsync();
 }
