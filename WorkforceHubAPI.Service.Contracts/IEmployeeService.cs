@@ -1,5 +1,6 @@
 using WorkforceHubAPI.Entities.Models;
 using WorkforceHubAPI.Shared.DataTransferObjects;
+using WorkforceHubAPI.Shared.RequestFeatures;
 
 namespace WorkforceHubAPI.Service.Contracts;
 
@@ -10,12 +11,24 @@ namespace WorkforceHubAPI.Service.Contracts;
 public interface IEmployeeService
 {
     /// <summary>
-    /// Retrieves all employees belonging to a specific company.
+    /// Retrieves a collection of employee data transfer objects (DTOs) for a specific company.
     /// </summary>
-    /// <param name="companyId">The unique identifier of the company.</param>
-    /// <param name="trackChanges">A flag indicating whether to track changes in the entity.</param>
-    /// <returns>A collection of EmployeeDto representing employees of the specified company.</returns>
-    Task<IEnumerable<EmployeeDto>> GetEmployeesAsync(string companyId, bool trackChanges);
+    /// <param name="companyId">The unique identifier of the company for which employee data is being retrieved.</param>
+    /// <param name="employeeParameters">
+    /// An instance of <see cref="EmployeeParameters"/> containing pagination and filtering details for the employee query.
+    /// </param>
+    /// <param name="trackChanges">A flag indicating whether changes to the data should be tracked in the context.</param>
+    /// <returns>
+    /// A <see cref="Task{TResult}"/> representing the asynchronous operation. The result is a tuple containing:
+    ///     <para>- An <see cref="IEnumerable{T}"/> of <see cref="EmployeeDto"/> entities, representing the employees on the current page.</para>
+    ///     <para>- A <see cref="MetaData"/> object, which provides pagination details like total count, current page, and total pages.</para>
+    /// </returns>
+    /// <remarks>
+    /// This method supports pagination and filtering based on the parameters provided in <paramref name="employeeParameters"/>.
+    /// The query result is limited by the <see cref="EmployeeParameters.PageSize"/> and <see cref="EmployeeParameters.PageNumber"/> values.
+    /// The method returns employee data in the form of <see cref="EmployeeDto"/> rather than the full <see cref="Employee"/> entities.
+    /// </remarks>
+    Task<(IEnumerable<EmployeeDto> employees, MetaData metaData)> GetEmployeesAsync(string companyId, EmployeeParameters employeeParameters, bool trackChanges);
 
     /// <summary>
     /// Retrieves a specific employee belonging to a specific company.

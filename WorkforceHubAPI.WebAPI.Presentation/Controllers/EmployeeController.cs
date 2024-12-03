@@ -1,7 +1,10 @@
+using System.Text.Json;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 using WorkforceHubAPI.Service.Contracts;
 using WorkforceHubAPI.Shared.DataTransferObjects;
+using WorkforceHubAPI.Shared.RequestFeatures;
 using WorkforceHubAPI.WebAPI.Presentation.ActionFilters;
 
 namespace WorkforceHubAPI.WebAPI.Presentation.Controllers;
@@ -18,16 +21,28 @@ public class EmployeeController : ControllerBase
     public EmployeeController(IServiceManager service) => _service = service;
 
     /// <summary>
-    /// Retrieves all employees for a specific company.
+    /// Retrieves a list of employees for a specific company, with pagination and filtering based on query parameters.
     /// </summary>
-    /// <param name="companyId">The unique identifier of the company.</param>
-    /// <returns>An <see cref="IActionResult"/> containing a list of employees for the specific company.</returns>
+    /// <param name="companyId">The unique identifier of the company for which employees are being fetched.</param>
+    /// <param name="employeeParameters">
+    /// An instance of <see cref="EmployeeParameters"/> that contains pagination and filtering information for the employee query.
+    /// This is passed in the query string as part of the request.
+    /// </param>
+    /// <returns>
+    /// A <see cref="Task{TResult}"/> representing the asynchronous operation. The result is an <see cref="IActionResult"/> that contains an HTTP response
+    /// with a status code of 200 OK and the list of employees matching the query parameters.
+    /// </returns>
+    /// <remarks>
+    /// This method makes an asynchronous call to the service layer to retrieve employee data, and returns the result in an HTTP 200 OK response.
+    /// The response includes a collection of employee data, paginated and filtered according to the provided <paramref name="employeeParameters"/>.
+    /// </remarks>
     [HttpGet]
-    public async Task<IActionResult> GetEmployeesForCompany(string companyId)
+    public async Task<IActionResult> GetEmployeesForCompany(string companyId, [FromQuery] EmployeeParameters employeeParameters)
     {
-        var employees = await _service.EmployeeService.GetEmployeesAsync(companyId, trackChanges: false);
+        var pagedResult = await _service.EmployeeService.GetEmployeesAsync(companyId, employeeParameters, trackChanges: false);
+        Response.Headers.Append("X-Pagination", JsonSerializer.Serialize(pagedResult.metaData));
 
-        return Ok(employees);
+        return Ok(pagedResult.employees);
     }
 
     /// <summary>

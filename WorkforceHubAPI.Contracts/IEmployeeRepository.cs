@@ -1,4 +1,5 @@
 using WorkforceHubAPI.Entities.Models;
+using WorkforceHubAPI.Shared.RequestFeatures;
 
 namespace WorkforceHubAPI.Contracts;
 
@@ -9,17 +10,17 @@ namespace WorkforceHubAPI.Contracts;
 public interface IEmployeeRepository
 {
     /// <summary>
-    /// Provides a method to retrieve all employees for a company using the company's identifier.
+    /// Retrieves a collection of employees associated with a specific company.
     /// </summary>
-    /// <param name="companyId">The unique identifier of the company.</param>
-    /// <param name="trackChanges">
-    /// A boolean flag indicating whether to track changes to the entities. If true, changes to the entities
-    /// are tracked by the context. If false, entities are queried without tracking.
-    /// </param>
-    /// <returns>
-    /// A collection of all the employees with the provided company identifier.
-    /// </returns>
-    Task<IEnumerable<Employee>> GetEmployeesAsync(Guid companyId, bool trackChanges);
+    /// <param name="companyId">The unique identifier of the company for which employees are being retrieved.</param>
+    /// <param name="employeeParameters">An instance of <see cref="EmployeeParameters"/> containing pagination and filtering details.</param>
+    /// <param name="trackChanges">A flag indicating whether changes to the data should be tracked in the context.</param>
+    /// <returns>A <see cref="Task{TResult}"/> representing the asynchronous operation. The result is a <see cref="PagedList{T}"/> collection of <see cref="Employee"/> entities.</returns>
+    /// <remarks>
+    /// This method supports pagination and filtering based on the parameters provided in <paramref name="employeeParameters"/>.
+    /// The query result is limited by the <see cref="EmployeeParameters.PageSize"/> and <see cref="EmployeeParameters.PageNumber"/> values.
+    /// </remarks>
+    Task<PagedList<Employee>> GetEmployeesAsync(Guid companyId, EmployeeParameters employeeParameters, bool trackChanges);
 
     /// <summary>
     /// Retrieves a specific employee using the provided employee identifier and company identifier.

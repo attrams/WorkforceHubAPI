@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using WorkforceHubAPI.Contracts;
 using WorkforceHubAPI.Entities.Models;
+using WorkforceHubAPI.Shared.RequestFeatures;
 
 namespace WorkforceHubAPI.Repository;
 
@@ -14,39 +15,21 @@ public class EmployeeRepository : RepositoryBase<Employee>, IEmployeeRepository
     public EmployeeRepository(RepositoryContext repositoryContext)
         : base(repositoryContext) { }
 
-    /// <summary>
-    /// Provides a method to retrieve all employees for a company using the company's identifier.
-    /// </summary>
-    /// <param name="companyId">The unique identifier of the company.</param>
-    /// <param name="trackChanges">
-    /// A boolean flag indicating whether to track changes to the entities. If true, changes to the entities
-    /// are tracked by the context. If false, entities are queried without tracking.
-    /// </param>
-    /// <returns>
-    /// A collection of all the employees with the provided company identifier.
-    /// </returns>
-    public async Task<IEnumerable<Employee>> GetEmployeesAsync(Guid companyId, bool trackChanges)
+    /// <inheritdoc/>
+    public async Task<PagedList<Employee>> GetEmployeesAsync(Guid companyId, EmployeeParameters employeeParameters, bool trackChanges)
     {
-        return await FindByCondition(
-            employee => employee.CompanyId.Equals(companyId), trackChanges
-        ).OrderBy(employee => employee.Name).ToListAsync();
+        var employees = await FindByCondition(employee => employee.CompanyId.Equals(companyId), trackChanges)
+                        .OrderBy(employee => employee.Name)
+                        .ToListAsync();
+
+        return PagedList<Employee>.ToPagedList(employees, employeeParameters.PageNumber, employeeParameters.PageSize);
     }
 
-    /// <summary>
-    /// Retrieves a specific employee using the provided employee identifier and company identifier.
-    /// </summary>
-    /// <param name="companyId">The unique identifier of the company the employee belongs to.</param>
-    /// <param name="employeeId">The unique identifier of the employee</param>
-    /// <param name="trackChanges">A flag indicating whether to track changes to the retrieved entity.</param>
-    /// <returns>
-    /// The employee entity with the specified identifier from the company with the identifier provided, or null if
-    /// no match is found.
-    /// </returns>
+    /// <inheritdoc/>
     public async Task<Employee?> GetEmployeeAsync(Guid companyId, Guid employeeId, bool trackChanges)
     {
-        return await FindByCondition(
-            employee => employee.CompanyId.Equals(companyId) && employee.Id.Equals(employeeId), trackChanges
-        ).SingleOrDefaultAsync();
+        return await FindByCondition(employee => employee.CompanyId.Equals(companyId) && employee.Id.Equals(employeeId), trackChanges)
+                        .SingleOrDefaultAsync();
     }
 
     /// <summary>

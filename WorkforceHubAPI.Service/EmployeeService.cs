@@ -4,6 +4,7 @@ using WorkforceHubAPI.Entities.Exceptions;
 using WorkforceHubAPI.Entities.Models;
 using WorkforceHubAPI.Service.Contracts;
 using WorkforceHubAPI.Shared.DataTransferObjects;
+using WorkforceHubAPI.Shared.RequestFeatures;
 
 namespace WorkforceHubAPI.Service;
 
@@ -29,32 +30,21 @@ internal sealed class EmployeeService : IEmployeeService
         _mapper = mapper;
     }
 
-    /// <summary>
-    /// Retrieves all employees belonging to a specific company.
-    /// </summary>
-    /// <param name="companyId">The unique identifier of the company.</param>
-    /// <param name="trackChanges">A flag indicating whether to track changes in the entity.</param>
-    /// <returns>A collection of EmployeeDto representing employees of the specified company.</returns>
+    /// <inheritdoc/>
     /// <exception cref="InvalidIdFormatException">Thrown when the company ID is not in a valid format.</exception>
     /// <exception cref="CompanyNotFoundException">Thrown when the company with the given ID does not exist.</exception>
-    public async Task<IEnumerable<EmployeeDto>> GetEmployeesAsync(string companyId, bool trackChanges)
+    public async Task<(IEnumerable<EmployeeDto> employees, MetaData metaData)> GetEmployeesAsync(string companyId, EmployeeParameters employeeParameters, bool trackChanges)
     {
         var parsedCompanyId = ValidateAndParseId(companyId, "company");
 
         await CheckIfCompanyExists(parsedCompanyId, trackChanges);
-        var employeesFromDb = await _repository.Employee.GetEmployeesAsync(parsedCompanyId, trackChanges);
-        var employeesDto = _mapper.Map<IEnumerable<EmployeeDto>>(employeesFromDb);
+        var employeesWithMetaData = await _repository.Employee.GetEmployeesAsync(parsedCompanyId, employeeParameters, trackChanges);
+        var employeesDto = _mapper.Map<IEnumerable<EmployeeDto>>(employeesWithMetaData);
 
-        return employeesDto;
+        return (employees: employeesDto, metaData: employeesWithMetaData.MetaData);
     }
 
-    /// <summary>
-    /// Retrieves a specific employee belonging to a specific company.
-    /// </summary>
-    /// <param name="companyId">The unique identifier of the company.</param>
-    /// <param name="employeeId">The unique identifer of the employee.</param>
-    /// <param name="trackChanges">A flag indicating whether to track changes in the entity.</param>
-    /// <returns>An EmployeeDto representing the specified employee.</returns>
+    /// <inheritdoc/>
     /// <exception cref="InvalidIdFormatException">Thrown when the company or employee ID is not in a valid format.</exception>
     /// <exception cref="CompanyNotFoundException">Thrown when the company with the given ID does not exist.</exception>
     /// <exception cref="EmployeeNotFoundException">Thrown when the employee with the given ID does not exist.</exception>
