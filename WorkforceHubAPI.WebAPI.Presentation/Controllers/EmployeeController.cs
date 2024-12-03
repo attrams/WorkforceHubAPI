@@ -39,10 +39,10 @@ public class EmployeeController : ControllerBase
     [HttpGet]
     public async Task<IActionResult> GetEmployeesForCompany(string companyId, [FromQuery] EmployeeParameters employeeParameters)
     {
-        var pagedResult = await _service.EmployeeService.GetEmployeesAsync(companyId, employeeParameters, trackChanges: false);
-        Response.Headers.Append("X-Pagination", JsonSerializer.Serialize(pagedResult.metaData));
+        var (employees, metaData) = await _service.EmployeeService.GetEmployeesAsync(companyId, employeeParameters, trackChanges: false);
+        Response.Headers.Append("X-Pagination", JsonSerializer.Serialize(metaData));
 
-        return Ok(pagedResult.employees);
+        return Ok(employees);
     }
 
     /// <summary>

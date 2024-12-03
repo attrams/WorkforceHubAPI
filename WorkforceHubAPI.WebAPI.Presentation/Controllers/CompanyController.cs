@@ -1,6 +1,9 @@
+using System.Text.Json;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using WorkforceHubAPI.Service.Contracts;
 using WorkforceHubAPI.Shared.DataTransferObjects;
+using WorkforceHubAPI.Shared.RequestFeatures;
 using WorkforceHubAPI.WebAPI.Presentation.ActionFilters;
 using WorkforceHubAPI.WebAPI.Presentation.ModelBinders;
 
@@ -27,19 +30,27 @@ public class CompanyController : ControllerBase
     }
 
     /// <summary>
-    /// Retrieves all companies from the database.
+    /// Retrieves a paginated list of companies based on the provided query parameters.
     /// </summary>
+    /// <param name="companyParameters">
+    /// An instance of <see cref="CompanyParameters"/> containing pagination and filtering details, 
+    /// such as page number, page size, and any additional filtering criteria.
+    /// </param>
     /// <returns>
-    /// An <see cref="IActionResult"/> containing the list of companies in the database or an error response if something 
-    /// goes wrong.
+    /// An <see cref="IActionResult"/> containing:
+    ///     <para>- An HTTP 200 OK response with the paginated list of companies and pagination metadata.</para>
+    ///     <para>- An appropriate error response if the request fails.</para>
     /// </returns>
     /// <remarks>
-    /// This endpoint fetches all companies without tracking changes in the database context.
+    /// This method retrieves a paginated list of companies from the service layer based on the query parameters provided 
+    /// in <paramref name="companyParameters"/>. Pagination metadata such as total count, current page, and total pages 
+    /// are included in the response.
     /// </remarks>
     [HttpGet]
-    public async Task<IActionResult> GetCompanies()
+    public async Task<IActionResult> GetCompanies([FromQuery] CompanyParameters companyParameters)
     {
-        var companies = await _service.CompanyService.GetAllCompaniesAsync(trackChanges: false);
+        var (companies, metaData) = await _service.CompanyService.GetAllCompaniesAsync(companyParameters, trackChanges: false);
+        Response.Headers.Append("X-Pagination", JsonSerializer.Serialize(metaData));
 
         // Returns a 200 OK response with the list of companies.
         return Ok(companies);

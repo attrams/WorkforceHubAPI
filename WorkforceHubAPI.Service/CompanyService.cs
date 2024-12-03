@@ -4,6 +4,7 @@ using WorkforceHubAPI.Entities.Exceptions;
 using WorkforceHubAPI.Entities.Models;
 using WorkforceHubAPI.Service.Contracts;
 using WorkforceHubAPI.Shared.DataTransferObjects;
+using WorkforceHubAPI.Shared.RequestFeatures;
 
 namespace WorkforceHubAPI.Service;
 
@@ -29,22 +30,13 @@ internal sealed class CompanyService : ICompanyService
         _mapper = mapper;
     }
 
-    /// <summary>
-    /// Retrieves all companies from the database and handles any potential exceptions during the operation.
-    /// </summary>
-    /// <param name="trackChanges">
-    /// A boolean flag indicating whether to track changes to the entities. If true, changes to the entities are
-    /// tracked by the context. If false, entities are queried without tracking.
-    /// </param>
-    /// <returns>
-    /// A collection of all companies in the database.
-    /// </returns>
-    public async Task<IEnumerable<CompanyDto>> GetAllCompaniesAsync(bool trackChanges)
+    /// <inheritdoc/>
+    public async Task<(IEnumerable<CompanyDto> companies, MetaData metaData)> GetAllCompaniesAsync(CompanyParameters companyParameters, bool trackChanges)
     {
-        var companies = await _repository.Company.GetAllCompaniesAsync(trackChanges);
-        var companiesDto = _mapper.Map<IEnumerable<CompanyDto>>(companies);
+        var companiesWithMetaData = await _repository.Company.GetAllCompaniesAsync(companyParameters, trackChanges);
+        var companiesDto = _mapper.Map<IEnumerable<CompanyDto>>(companiesWithMetaData);
 
-        return companiesDto;
+        return (companies: companiesDto, metaData: companiesWithMetaData.MetaData);
     }
 
     /// <summary>

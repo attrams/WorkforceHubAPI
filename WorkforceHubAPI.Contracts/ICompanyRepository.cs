@@ -1,4 +1,5 @@
 using WorkforceHubAPI.Entities.Models;
+using WorkforceHubAPI.Shared.RequestFeatures;
 
 namespace WorkforceHubAPI.Contracts;
 
@@ -9,16 +10,26 @@ namespace WorkforceHubAPI.Contracts;
 public interface ICompanyRepository
 {
     /// <summary>
-    /// Provides a method to retrieve all companies from the database.
+    /// Retrieves a paginated list of companies, with support for pagination and filtering based on query parameters.
     /// </summary>
+    /// <param name="companyParameters">
+    /// An instance of <see cref="CompanyParameters"/> that contains pagination and filtering details for the query.
+    /// This parameter specifies the page number, page size, and any additional filters to apply when retrieving the companies.
+    /// </param>
     /// <param name="trackChanges">
-    /// A boolean flag indicating whether to track changes to the entities. If true, changes to the entities
-    /// are tracked by the context. If false, entities are queried without tracking.
+    /// A flag indicating whether changes to the data should be tracked in the context.
     /// </param>
     /// <returns>
-    /// A collection of all companies in the database.
+    /// A <see cref="Task{TResult}"/> representing the asynchronous operation. The result is a <see cref="PagedList{T}"/> 
+    /// containing the list of <see cref="Company"/> entities for the current page, along with pagination metadata.
     /// </returns>
-    Task<IEnumerable<Company>> GetAllCompaniesAsync(bool trackChanges);
+    /// <remarks>
+    /// This method is used to retrieve companies in a paginated format. It supports filtering and pagination 
+    /// based on the values provided in the <paramref name="companyParameters"/>. 
+    /// The result includes a paginated list of companies and metadata about the pagination, 
+    /// such as total count, current page, and total pages.
+    /// </remarks>
+    Task<PagedList<Company>> GetAllCompaniesAsync(CompanyParameters companyParameters, bool trackChanges);
 
     /// <summary>
     /// Retrieves a specific company by its unique identifier.

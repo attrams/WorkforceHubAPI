@@ -1,4 +1,5 @@
 using WorkforceHubAPI.Shared.DataTransferObjects;
+using WorkforceHubAPI.Shared.RequestFeatures;
 
 namespace WorkforceHubAPI.Service.Contracts;
 
@@ -9,16 +10,25 @@ namespace WorkforceHubAPI.Service.Contracts;
 public interface ICompanyService
 {
     /// <summary>
-    /// Provides functionality to retrieve all companies from the database.
+    /// Retrieves a paginated list of company data transfer objects (DTOs), with pagination and filtering based on query parameters.
     /// </summary>
+    /// <param name="companyParameters">
+    /// An instance of <see cref="CompanyParameters"/> containing pagination and filtering details for the query.
+    /// This parameter specifies the page number, page size, and any additional filters to apply when retrieving the companies.
+    /// </param>
     /// <param name="trackChanges">
-    /// A boolean flag indicating whether to track changes to the entities. If true, changes to
-    /// the entities are tracked by the context. If false, entities are queried without tracking.
+    /// A flag indicating whether changes to the data should be tracked in the context.
     /// </param>
     /// <returns>
-    /// A collection of all companies in the database.
+    /// A <see cref="Task{TResult}"/> representing the asynchronous operation. The result is a tuple containing:
+    ///     <para>- <see cref="IEnumerable{T}"/> of <see cref="CompanyDto"/>: A collection of companies for the current page.</para>
+    ///     <para>- <see cref="MetaData"/>: An object containing pagination details such as total count, current page, and total pages.</para>
     /// </returns>
-    Task<IEnumerable<CompanyDto>> GetAllCompaniesAsync(bool trackChanges);
+    /// <remarks>
+    /// This method supports pagination and filtering based on the values provided in <paramref name="companyParameters"/>.
+    /// It returns a collection of company data as DTOs and includes metadata about the pagination state.
+    /// </remarks>
+    Task<(IEnumerable<CompanyDto> companies, MetaData metaData)> GetAllCompaniesAsync(CompanyParameters companyParameters, bool trackChanges);
 
     /// <summary>
     /// Retrieves a collection of companies based on the provided IDs.
