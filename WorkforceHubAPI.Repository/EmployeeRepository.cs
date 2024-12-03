@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using WorkforceHubAPI.Contracts;
 using WorkforceHubAPI.Entities.Models;
+using WorkforceHubAPI.Repository.Extensions;
 using WorkforceHubAPI.Shared.RequestFeatures;
 
 namespace WorkforceHubAPI.Repository;
@@ -18,9 +19,9 @@ public class EmployeeRepository : RepositoryBase<Employee>, IEmployeeRepository
     /// <inheritdoc/>
     public async Task<PagedList<Employee>> GetEmployeesAsync(Guid companyId, EmployeeParameters employeeParameters, bool trackChanges)
     {
-        var employees = await FindByCondition(employee =>
-                employee.CompanyId.Equals(companyId) && employee.Age >= employeeParameters.MinAge && employee.Age <= employeeParameters.MaxAge, trackChanges
-            )
+        var employees = await FindByCondition(employee => employee.CompanyId.Equals(companyId), trackChanges)
+            .FilterEmployees(employeeParameters.MinAge, employeeParameters.MaxAge)
+            .Search(employeeParameters.SearchTerm!)
             .OrderBy(employee => employee.Name)
             .ToListAsync();
 

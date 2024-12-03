@@ -22,7 +22,9 @@ public class CompanyRepository : RepositoryBase<Company>, ICompanyRepository
 
         if (!string.IsNullOrWhiteSpace(companyParameters.Country))
         {
-            query = FindByCondition(company => company.Country!.Equals(companyParameters.Country), trackChanges).OrderBy(company => company.Name);
+            query = FindByCondition(
+                company => company.Country!.ToLower().Equals(companyParameters.Country.ToLower()), trackChanges).OrderBy(company => company.Name
+            );
         }
 
         var companies = await query.ToListAsync();
