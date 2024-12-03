@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 using WorkforceHubAPI.Service.Contracts;
 using WorkforceHubAPI.Shared.DataTransferObjects;
+using WorkforceHubAPI.WebAPI.Presentation.ActionFilters;
 
 namespace WorkforceHubAPI.WebAPI.Presentation.Controllers;
 
@@ -50,12 +51,9 @@ public class EmployeeController : ControllerBase
     /// <param name="employee">The data transfer object containing the employee details.</param>
     /// <returns>A response with the created employee data, including a URI to access the newly created employee's details.</returns>
     [HttpPost]
+    [ServiceFilter(typeof(ValidationFilterAttribute))]
     public async Task<IActionResult> CreateEmployeeForCompany(string companyId, [FromBody] EmployeeForCreationDto employee)
     {
-        if (!ModelState.IsValid)
-        {
-            return UnprocessableEntity(ModelState);
-        }
         var employeeToReturn = await _service.EmployeeService.CreateEmployeeForCompanyAsync(companyId, employee, trackChanges: false);
 
         // Return the newly created employee with a route to access it, along with a 201 status code.
@@ -84,13 +82,9 @@ public class EmployeeController : ControllerBase
     /// <param name="employee">The data transfer object containing updated employee information.</param>
     /// <returns>Returns a 204 No Content response if the employee is successfully updated.</returns>
     [HttpPut("{employeeId}")]
+    [ServiceFilter(typeof(ValidationFilterAttribute))]
     public async Task<IActionResult> UpdateEmployeeForCompany(string companyId, string employeeId, [FromBody] EmployeeForUpdateDto employee)
     {
-        if (!ModelState.IsValid)
-        {
-            return UnprocessableEntity(ModelState);
-        }
-
         await _service.EmployeeService.UpdateEmployeeForCompanyAsync(companyId, employeeId, employee, trackCompanyChanges: false, trackEmployeeChanges: true);
 
         return NoContent();

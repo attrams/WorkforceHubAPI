@@ -39,13 +39,10 @@ internal sealed class EmployeeService : IEmployeeService
     /// <exception cref="CompanyNotFoundException">Thrown when the company with the given ID does not exist.</exception>
     public async Task<IEnumerable<EmployeeDto>> GetEmployeesAsync(string companyId, bool trackChanges)
     {
-        if (!Guid.TryParse(companyId, out var parsedId))
-        {
-            throw new InvalidIdFormatException($"The company with id: {companyId} doesn't exist in the database.");
-        }
+        var parsedCompanyId = ValidateAndParseId(companyId, "company");
 
-        var company = await _repository.Company.GetCompanyAsync(parsedId, trackChanges) ?? throw new CompanyNotFoundException(parsedId);
-        var employeesFromDb = await _repository.Employee.GetEmployeesAsync(parsedId, trackChanges);
+        await CheckIfCompanyExists(parsedCompanyId, trackChanges);
+        var employeesFromDb = await _repository.Employee.GetEmployeesAsync(parsedCompanyId, trackChanges);
         var employeesDto = _mapper.Map<IEnumerable<EmployeeDto>>(employeesFromDb);
 
         return employeesDto;
@@ -63,18 +60,11 @@ internal sealed class EmployeeService : IEmployeeService
     /// <exception cref="EmployeeNotFoundException">Thrown when the employee with the given ID does not exist.</exception>
     public async Task<EmployeeDto> GetEmployeeAsync(string companyId, string employeeId, bool trackChanges)
     {
-        if (!Guid.TryParse(companyId, out var parsedCompanyId))
-        {
-            throw new InvalidIdFormatException($"The company with id: {companyId} doesn't exist in the database.");
-        }
+        var parsedCompanyId = ValidateAndParseId(companyId, "company");
+        var parsedEmployeeId = ValidateAndParseId(employeeId, "employee");
 
-        if (!Guid.TryParse(employeeId, out var parsedEmployeeId))
-        {
-            throw new InvalidIdFormatException($"The employee with id: {employeeId} doesn't exist in the database.");
-        }
-
-        var company = await _repository.Company.GetCompanyAsync(parsedCompanyId, trackChanges) ?? throw new CompanyNotFoundException(parsedCompanyId);
-        var employeeDb = await _repository.Employee.GetEmployeeAsync(parsedCompanyId, parsedEmployeeId, trackChanges) ?? throw new EmployeeNotFoundException(parsedEmployeeId);
+        await CheckIfCompanyExists(parsedCompanyId, trackChanges);
+        var employeeDb = await GetEmployeeForCompanyAndCheckIfItExists(parsedCompanyId, parsedEmployeeId, trackChanges);
         var employee = _mapper.Map<EmployeeDto>(employeeDb);
 
         return employee;
@@ -92,17 +82,9 @@ internal sealed class EmployeeService : IEmployeeService
     /// <exception cref="CompanyNotFoundException">Thrown when the specified company is not found in the database.</exception>
     public async Task<EmployeeDto> CreateEmployeeForCompanyAsync(string companyId, EmployeeForCreationDto employeeForCreation, bool trackChanges)
     {
-        if (employeeForCreation is null)
-        {
-            throw new BadRequestException("EmployeeForCreationDto object is null.");
-        }
+        var parsedCompanyId = ValidateAndParseId(companyId, "company");
 
-        if (!Guid.TryParse(companyId, out var parsedCompanyId))
-        {
-            throw new InvalidIdFormatException($"The company with id: {companyId} doesn't exist in the database.");
-        }
-
-        var company = await _repository.Company.GetCompanyAsync(parsedCompanyId, trackChanges) ?? throw new CompanyNotFoundException(parsedCompanyId);
+        await CheckIfCompanyExists(parsedCompanyId, trackChanges);
         var employeeEntity = _mapper.Map<Employee>(employeeForCreation);
 
         _repository.Employee.CreateEmployeeForCompany(parsedCompanyId, employeeEntity);
@@ -121,18 +103,11 @@ internal sealed class EmployeeService : IEmployeeService
     /// <exception cref="EmployeeNotFoundException">Exception thrown when the specified employee is not found in the database.</exception>
     public async Task DeleteEmployeeForCompanyAsync(string companyId, string employeeId, bool trackChanges)
     {
-        if (!Guid.TryParse(companyId, out var parsedCompanyId))
-        {
-            throw new InvalidIdFormatException($"The company with id: {companyId} doesn't exist in the database.");
-        }
+        var parsedCompanyId = ValidateAndParseId(companyId, "company");
+        var parsedEmployeeId = ValidateAndParseId(employeeId, "employee");
 
-        if (!Guid.TryParse(employeeId, out var parsedEmployeeId))
-        {
-            throw new InvalidIdFormatException($"The employee with id: {employeeId} doesn't exist in the database.");
-        }
-
-        var company = await _repository.Company.GetCompanyAsync(parsedCompanyId, trackChanges) ?? throw new CompanyNotFoundException(parsedCompanyId);
-        var employeeForCompany = await _repository.Employee.GetEmployeeAsync(parsedCompanyId, parsedEmployeeId, trackChanges) ?? throw new EmployeeNotFoundException(parsedEmployeeId);
+        await CheckIfCompanyExists(parsedCompanyId, trackChanges);
+        var employeeForCompany = await GetEmployeeForCompanyAndCheckIfItExists(parsedCompanyId, parsedEmployeeId, trackChanges);
 
         _repository.Employee.DeleteEmployee(employeeForCompany);
         await _repository.SaveAsync();
@@ -140,26 +115,15 @@ internal sealed class EmployeeService : IEmployeeService
 
     /// <inheritdoc/>
     /// <exception cref="InvalidIdFormatException">Thrown when the provided company ID or employee ID is not in the correct format.</exception>
-    /// <exception cref="BadRequestException">Thrown when the <see cref="EmployeeForUpdateDto"/> is null.</exception>
     /// <exception cref="CompanyNotFoundException">Thrown when the specified company cannot be found in the database.</exception>
     /// <exception cref="EmployeeNotFoundException">Thrown when the specified employee cannot be found in the database.</exception>
     public async Task UpdateEmployeeForCompanyAsync(string companyId, string employeeId, EmployeeForUpdateDto employeeForUpdate, bool trackCompanyChanges, bool trackEmployeeChanges)
     {
-        if (!Guid.TryParse(companyId, out var parsedCompanyId))
-        {
-            throw new InvalidIdFormatException($"The company with id: {companyId} doesn't exist in the database.");
-        }
-        if (!Guid.TryParse(employeeId, out var parsedEmployeeId))
-        {
-            throw new InvalidIdFormatException($"The employee with id: {employeeId} doesn't exist in the database.");
-        }
-        if (employeeForUpdate is null)
-        {
-            throw new BadRequestException("EmployeeForUpdateDto is null");
-        }
+        var parsedCompanyId = ValidateAndParseId(companyId, "company");
+        var parsedEmployeeId = ValidateAndParseId(employeeId, "employee");
 
-        var company = await _repository.Company.GetCompanyAsync(parsedCompanyId, trackCompanyChanges) ?? throw new CompanyNotFoundException(parsedCompanyId);
-        var employeeEntity = await _repository.Employee.GetEmployeeAsync(parsedCompanyId, parsedEmployeeId, trackEmployeeChanges) ?? throw new EmployeeNotFoundException(parsedEmployeeId);
+        await CheckIfCompanyExists(parsedCompanyId, trackCompanyChanges);
+        var employeeEntity = await GetEmployeeForCompanyAndCheckIfItExists(parsedCompanyId, parsedEmployeeId, trackEmployeeChanges);
 
         _mapper.Map(employeeForUpdate, employeeEntity);
         await _repository.SaveAsync();
@@ -171,17 +135,11 @@ internal sealed class EmployeeService : IEmployeeService
     /// <exception cref="EmployeeNotFoundException">Thrown if the specified employee is not found.</exception>
     public async Task<(EmployeeForUpdateDto employeeToPatch, Employee employeeEntity)> GetEmployeeForPatchAsync(string companyId, string employeeId, bool trackCompanyChanges, bool trackEmployeeChanges)
     {
-        if (!Guid.TryParse(companyId, out var parsedCompanyId))
-        {
-            throw new InvalidIdFormatException($"The company with id: {companyId} doesn't exist in the database.");
-        }
-        if (!Guid.TryParse(employeeId, out var parsedEmployeeId))
-        {
-            throw new InvalidIdFormatException($"The employee with id: {employeeId} doesn't exist in the database.");
-        }
+        var parsedCompanyId = ValidateAndParseId(companyId, "company");
+        var parsedEmployeeId = ValidateAndParseId(employeeId, "employee");
 
-        var company = await _repository.Company.GetCompanyAsync(parsedCompanyId, trackCompanyChanges) ?? throw new CompanyNotFoundException(parsedCompanyId);
-        var employeeEntity = await _repository.Employee.GetEmployeeAsync(parsedCompanyId, parsedEmployeeId, trackEmployeeChanges) ?? throw new EmployeeNotFoundException(parsedEmployeeId);
+        await CheckIfCompanyExists(parsedCompanyId, trackCompanyChanges);
+        var employeeEntity = await GetEmployeeForCompanyAndCheckIfItExists(parsedCompanyId, parsedEmployeeId, trackEmployeeChanges);
         var employeeToPatch = _mapper.Map<EmployeeForUpdateDto>(employeeEntity);
 
         return (employeeToPatch, employeeEntity);
@@ -191,7 +149,52 @@ internal sealed class EmployeeService : IEmployeeService
     public async Task SaveChangesForPatchAsync(EmployeeForUpdateDto employeeToPatch, Employee employeeEntity)
     {
         _mapper.Map(employeeToPatch, employeeEntity);
-
         await _repository.SaveAsync();
+    }
+
+    /// <summary>
+    /// Checks if a company with the specified ID exists in the database.
+    /// </summary>
+    /// <param name="companyId">The unique identifier of the company to check.</param>
+    /// <param name="trackChanges">A boolean flag indicating whether to track changes to the entity in the database context</param>
+    /// <returns>A <see cref="Task"/> representing the asynchronous operation.</returns>
+    /// <exception cref="CompanyNotFoundException">Thrown if no company is found with the specified <paramref name="companyId"/>.</exception>
+    private async Task CheckIfCompanyExists(Guid companyId, bool trackChanges)
+    {
+        _ = await _repository.Company.GetCompanyAsync(companyId, trackChanges) ?? throw new CompanyNotFoundException(companyId);
+    }
+
+    /// <summary>
+    /// Retrieves an employee by their ID within a specific company and ensures the employee exists.
+    /// </summary>
+    /// <param name="companyId">The unique identifier of the company to which the employee belongs to.</param>
+    /// <param name="employeeId">The unique identifier of the employee to retrieve.</param>
+    /// <param name="trackChanges">A boolean flag indicating whether to track changes to the entity in the database context.</param>
+    /// <returns>A <see cref="Task{TResult}"/> containing the <see cref="Employee"/> entity if found.</returns>
+    /// <exception cref="EmployeeNotFoundException">
+    /// Thrown if no employee is found with the specified <paramref name="employeeId"/> in the specified company.
+    /// </exception>
+    private async Task<Employee> GetEmployeeForCompanyAndCheckIfItExists(Guid companyId, Guid employeeId, bool trackChanges)
+    {
+        return await _repository.Employee.GetEmployeeAsync(companyId, employeeId, trackChanges) ?? throw new EmployeeNotFoundException(employeeId);
+    }
+
+    /// <summary>
+    /// Validates ID and converts it to a <see cref="Guid"/>.
+    /// </summary>
+    /// <param name="id">The unique identifier to validate and parse.</param>
+    /// <param name="entityName">
+    /// A descriptive name of the entity (e.g., "company", "employee") used in the error message.
+    /// </param>
+    /// <returns>The parsed <paramref name="id"/> as <see cref="Guid"/> if the ID is valid.</returns>
+    /// <exception cref="InvalidIdFormatException">Thrown if the provided <paramref name="id"/> is not a valid GUID.</exception>
+    private Guid ValidateAndParseId(string id, string entityName)
+    {
+        if (!Guid.TryParse(id, out var parsedId))
+        {
+            throw new InvalidIdFormatException($"The {entityName} with id: {id} doesn't exist in the database.");
+        }
+
+        return parsedId;
     }
 }

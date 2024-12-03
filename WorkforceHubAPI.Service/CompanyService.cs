@@ -42,7 +42,6 @@ internal sealed class CompanyService : ICompanyService
     public async Task<IEnumerable<CompanyDto>> GetAllCompaniesAsync(bool trackChanges)
     {
         var companies = await _repository.Company.GetAllCompaniesAsync(trackChanges);
-
         var companiesDto = _mapper.Map<IEnumerable<CompanyDto>>(companies);
 
         return companiesDto;
@@ -56,12 +55,8 @@ internal sealed class CompanyService : ICompanyService
     /// <returns>A data transfer object (DTO) representing the company with the specified identifier.</returns>
     public async Task<CompanyDto> GetCompanyAsync(string companyId, bool trackChanges)
     {
-        if (!Guid.TryParse(companyId, out var parsedId))
-        {
-            throw new InvalidIdFormatException($"The company with id: {companyId} doesn't exist.");
-        }
-
-        var company = await _repository.Company.GetCompanyAsync(parsedId, trackChanges) ?? throw new CompanyNotFoundException(parsedId);
+        var parsedCompanyId = ValidateCompanyIdFormat(companyId);
+        var company = await GetCompanyAndCheckIfItExists(parsedCompanyId, trackChanges);
         var companyDto = _mapper.Map<CompanyDto>(company);
 
         return companyDto;
@@ -128,16 +123,9 @@ internal sealed class CompanyService : ICompanyService
     /// </summary>
     /// <param name="company">The data transfer object containing the company details.</param>
     /// <returns>The created company as a <see cref="CompanyDto"/>.</returns>
-    /// <exception cref="BadRequestException">Thrown when the provided <see cref="CompanyForCreationDto"/> is null.</exception>
     public async Task<CompanyDto> CreateCompanyAsync(CompanyForCreationDto company)
     {
-        if (company is null)
-        {
-            throw new BadRequestException("CompanyForCreationDto object is null.");
-        }
-
         var companyEntity = _mapper.Map<Company>(company);
-
         _repository.Company.CreateCompany(companyEntity);
         await _repository.SaveAsync();
 
@@ -184,36 +172,49 @@ internal sealed class CompanyService : ICompanyService
     /// <exception cref="CompanyNotFoundException">Thrown if the company with the specified ID does not exist.</exception>
     public async Task DeleteCompanyAsync(string companyId, bool trackChanges)
     {
-        if (!Guid.TryParse(companyId, out var parsedCompanyId))
-        {
-            throw new InvalidIdFormatException($"The company with id: {companyId} doesn't exist.");
-        }
-
-        var company = await _repository.Company.GetCompanyAsync(parsedCompanyId, trackChanges) ?? throw new CompanyNotFoundException(parsedCompanyId);
-
+        var parsedCompanyId = ValidateCompanyIdFormat(companyId);
+        var company = await GetCompanyAndCheckIfItExists(parsedCompanyId, trackChanges);
         _repository.Company.DeleteCompany(company);
         await _repository.SaveAsync();
     }
 
     /// <inheritdoc/>
-    /// <exception cref="BadRequestException">Thrown when the <see cref="CompanyForUpdateDto"/> is null.</exception>
     /// <exception cref="InvalidIdFormatException">Thrown when the provided company ID is not a valid GUID format.</exception>
     /// <exception cref="CompanyNotFoundException">Thrown when no company is found for the provided ID.</exception>
     public async Task UpdateCompanyAsync(string companyId, CompanyForUpdateDto companyForUpdate, bool trackChanges)
     {
-        if (companyForUpdate is null)
-        {
-            throw new BadRequestException("CompanyForUpdateDto object is null.");
-        }
+        var parsedCompanyId = ValidateCompanyIdFormat(companyId);
+        var companyEntity = await GetCompanyAndCheckIfItExists(parsedCompanyId, trackChanges);
+        _mapper.Map(companyForUpdate, companyEntity);
+        await _repository.SaveAsync();
+    }
 
+    /// <summary>
+    /// Retrieves a company by its ID and ensures it exists in the database.
+    /// </summary>
+    /// <param name="companyId">The unique identifier of the company to retrieve.</param>
+    /// <param name="trackChanges"> A boolean flag indicating whether to track changes to the entity in the database context.</param>
+    /// <returns>The <see cref="Company"/> entity corresponding to the given ID.</returns>
+    /// <exception cref="CompanyNotFoundException">Thrown if no company is found with the specified <paramref name="companyId"/>.</exception>
+    private async Task<Company> GetCompanyAndCheckIfItExists(Guid companyId, bool trackChanges)
+    {
+        var company = await _repository.Company.GetCompanyAsync(companyId, trackChanges) ?? throw new CompanyNotFoundException(companyId);
+        return company;
+    }
+
+    /// <summary>
+    /// Validates the format of a company ID string and converts it to a <see cref="Guid"/>.
+    /// </summary>
+    /// <param name="companyId">The unique identier of the company as a string.</param>
+    /// <returns>The parsed <see cref="Guid"/> if the ID is valid.</returns>
+    /// <exception cref="InvalidIdFormatException">Thrown if the provided <paramref name="companyId"/> is not a valid GUID.</exception>
+    private Guid ValidateCompanyIdFormat(string companyId)
+    {
         if (!Guid.TryParse(companyId, out var parsedCompanyId))
         {
             throw new InvalidIdFormatException($"The company with id: {companyId} doesn't exist.");
         }
 
-        var companyEntity = await _repository.Company.GetCompanyAsync(parsedCompanyId, trackChanges) ?? throw new CompanyNotFoundException(parsedCompanyId);
-
-        _mapper.Map(companyForUpdate, companyEntity);
-        await _repository.SaveAsync();
+        return parsedCompanyId;
     }
 }

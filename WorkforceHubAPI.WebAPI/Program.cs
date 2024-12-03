@@ -7,6 +7,7 @@ using WorkforceHubAPI.Contracts;
 using WorkforceHubAPI.WebAPI;
 using WorkforceHubAPI.WebAPI.Extensions;
 using WorkforceHubAPI.WebAPI.Formatters;
+using WorkforceHubAPI.WebAPI.Presentation.ActionFilters;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -52,6 +53,9 @@ builder.Services.Configure<ApiBehaviorOptions>(options =>
 {
     options.SuppressModelStateInvalidFilter = true;
 });
+
+// Register the custom validation filter attribute in the dependency injection container.
+builder.Services.AddScoped<ValidationFilterAttribute>();
 
 // Configures the application's controller services and ensures that the controllers from the specified
 // assembly (via the AssemblyReference class in WorkforceHubAPI.WebAPI.Presentation project) are included

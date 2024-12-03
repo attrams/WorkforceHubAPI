@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using WorkforceHubAPI.Service.Contracts;
 using WorkforceHubAPI.Shared.DataTransferObjects;
+using WorkforceHubAPI.WebAPI.Presentation.ActionFilters;
 using WorkforceHubAPI.WebAPI.Presentation.ModelBinders;
 
 namespace WorkforceHubAPI.WebAPI.Presentation.Controllers;
@@ -81,13 +82,9 @@ public class CompanyController : ControllerBase
     /// A 201 Created response with the location of the newly created company and its details.
     /// </returns>
     [HttpPost]
+    [ServiceFilter(typeof(ValidationFilterAttribute))]
     public async Task<IActionResult> CreateCompany([FromBody] CompanyForCreationDto company)
     {
-        if (!ModelState.IsValid)
-        {
-            return UnprocessableEntity(ModelState);
-        }
-
         var createdCompany = await _service.CompanyService.CreateCompanyAsync(company);
 
         // Return the created company with the appropriate route for retrieving it.
@@ -136,12 +133,9 @@ public class CompanyController : ControllerBase
     /// </param>
     /// <returns>Returns a <see cref="NoContentResult"/> if the update operation is successful.</returns>
     [HttpPut("{companyId}")]
+    [ServiceFilter(typeof(ValidationFilterAttribute))]
     public async Task<IActionResult> UpdateCompany(string companyId, [FromBody] CompanyForUpdateDto company)
     {
-        if (!ModelState.IsValid)
-        {
-            return UnprocessableEntity(ModelState);
-        }
         await _service.CompanyService.UpdateCompanyAsync(companyId, company, trackChanges: true);
 
         return NoContent();
