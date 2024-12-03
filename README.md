@@ -73,7 +73,7 @@ responsibility. Below is a breakdown of each project in the solution:
 - Data persistence with SQL Server.
 - Migration-based database management.
 - Mock data pre-seeded for development.
-- Pagination.
+- Pagination and Filtering.
 
 ## Getting Started
 
