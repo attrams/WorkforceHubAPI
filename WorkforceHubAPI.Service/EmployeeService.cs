@@ -35,6 +35,11 @@ internal sealed class EmployeeService : IEmployeeService
     /// <exception cref="CompanyNotFoundException">Thrown when the company with the given ID does not exist.</exception>
     public async Task<(IEnumerable<EmployeeDto> employees, MetaData metaData)> GetEmployeesAsync(string companyId, EmployeeParameters employeeParameters, bool trackChanges)
     {
+        if (!employeeParameters.ValidAgeRange)
+        {
+            throw new MaxAgeRangeBadRequestException();
+        }
+
         var parsedCompanyId = ValidateAndParseId(companyId, "company");
 
         await CheckIfCompanyExists(parsedCompanyId, trackChanges);

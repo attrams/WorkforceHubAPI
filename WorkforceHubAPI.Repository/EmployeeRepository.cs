@@ -18,9 +18,11 @@ public class EmployeeRepository : RepositoryBase<Employee>, IEmployeeRepository
     /// <inheritdoc/>
     public async Task<PagedList<Employee>> GetEmployeesAsync(Guid companyId, EmployeeParameters employeeParameters, bool trackChanges)
     {
-        var employees = await FindByCondition(employee => employee.CompanyId.Equals(companyId), trackChanges)
-                        .OrderBy(employee => employee.Name)
-                        .ToListAsync();
+        var employees = await FindByCondition(employee =>
+                employee.CompanyId.Equals(companyId) && employee.Age >= employeeParameters.MinAge && employee.Age <= employeeParameters.MaxAge, trackChanges
+            )
+            .OrderBy(employee => employee.Name)
+            .ToListAsync();
 
         return PagedList<Employee>.ToPagedList(employees, employeeParameters.PageNumber, employeeParameters.PageSize);
     }

@@ -18,9 +18,15 @@ public class CompanyRepository : RepositoryBase<Company>, ICompanyRepository
     /// <inheritdoc/>
     public async Task<PagedList<Company>> GetAllCompaniesAsync(CompanyParameters companyParameters, bool trackChanges)
     {
-        var companies = await FindAll(trackChanges)
-                                .OrderBy(company => company.Name)
-                                .ToListAsync();
+        var query = FindAll(trackChanges).OrderBy(company => company.Name);
+
+        if (!string.IsNullOrWhiteSpace(companyParameters.Country))
+        {
+            query = FindByCondition(company => company.Country!.Equals(companyParameters.Country), trackChanges).OrderBy(company => company.Name);
+        }
+
+        var companies = await query.ToListAsync();
+
         return PagedList<Company>.ToPagedList(companies, companyParameters.PageNumber, companyParameters.PageSize);
     }
 

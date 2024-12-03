@@ -11,5 +11,10 @@ namespace WorkforceHubAPI.Shared.RequestFeatures;
 /// </remarks>
 public class CompanyParameters : RequestParameters
 {
-
+    private string? _country;
+    public string? Country
+    {
+        get => _country;
+        set => _country = string.IsNullOrWhiteSpace(value) ? "Ghana" : value.Trim();
+    }
 }
