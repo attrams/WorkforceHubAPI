@@ -1,4 +1,8 @@
 using WorkforceHubAPI.Entities.Models;
+using System.Reflection;
+using System.Text;
+using System.Linq.Dynamic.Core;
+using WorkforceHubAPI.Repository.Extensions.Utility;
 
 namespace WorkforceHubAPI.Repository.Extensions;
 
@@ -39,5 +43,30 @@ public static class RepositoryEmployeeExtensions
         var lowerCaseTerm = searchTerm.Trim().ToLower();
 
         return employees.Where(employee => employee.Name!.ToLower().Contains(lowerCaseTerm));
+    }
+
+    /// <summary>
+    /// Sorts the employees based on the specified order-by query string.
+    /// </summary>
+    /// <param name="employees">The IQueryable collection of employees to be sorted.</param>
+    /// <param name="orderByQueryString">A comma-separated string specifying the properties and sort directions (e.g., "Name asc, Age desc").</param>
+    /// <returns>
+    /// The sorted IQueryable collection of employees. If no valid query is provided, defaults to sorting by the "Name" property.
+    /// </returns>
+    public static IQueryable<Employee> Sort(this IQueryable<Employee> employees, string orderByQueryString)
+    {
+        if (string.IsNullOrWhiteSpace(orderByQueryString))
+        {
+            return employees.OrderBy(employee => employee.Name);
+        }
+
+        var orderQuery = OrderQueryBuilder.CreateOrderQuery<Employee>(orderByQueryString);
+
+        if (string.IsNullOrWhiteSpace(orderQuery))
+        {
+            return employees.OrderBy(employee => employee.Name);
+        }
+
+        return employees.OrderBy(orderQuery);
     }
 }

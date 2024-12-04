@@ -22,7 +22,7 @@ public class EmployeeRepository : RepositoryBase<Employee>, IEmployeeRepository
         var employees = await FindByCondition(employee => employee.CompanyId.Equals(companyId), trackChanges)
             .FilterEmployees(employeeParameters.MinAge, employeeParameters.MaxAge)
             .Search(employeeParameters.SearchTerm!)
-            .OrderBy(employee => employee.Name)
+            .Sort(employeeParameters.OrderBy!)
             .ToListAsync();
 
         return PagedList<Employee>.ToPagedList(employees, employeeParameters.PageNumber, employeeParameters.PageSize);
