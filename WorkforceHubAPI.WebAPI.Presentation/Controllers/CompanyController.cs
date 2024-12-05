@@ -1,6 +1,7 @@
 using System.Text.Json;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ApiExplorer;
 using WorkforceHubAPI.Service.Contracts;
 using WorkforceHubAPI.Shared.DataTransferObjects;
 using WorkforceHubAPI.Shared.RequestFeatures;
@@ -18,15 +19,40 @@ public class CompanyController : ControllerBase
 {
     private readonly IServiceManager _service;
 
-    /// <summary>
-    /// Initializes a new instance of the <see cref="CompanyController"/> class.
-    /// </summary>
-    /// <param name="service">
-    /// An instance of <see cref="IServiceManager"/> that provides access to the business logic related to companies.
-    /// </param>
-    public CompanyController(IServiceManager service)
+    private readonly IApiDescriptionGroupCollectionProvider _apiDescriptionGroupCollectionProvider;
+
+    public CompanyController(IServiceManager service, IApiDescriptionGroupCollectionProvider apiDescriptionGroupCollectionProvider)
     {
         _service = service;
+        _apiDescriptionGroupCollectionProvider = apiDescriptionGroupCollectionProvider;
+    }
+
+    /// <summary>
+    /// Handles the HTTP OPTIONS request for the controller by dynamically determining supported HTTP methods.
+    /// </summary>
+    /// <returns>
+    /// A response containing the "Allow" header with the supported HTTP mrthods.
+    /// </returns>
+    [HttpOptions]
+    public IActionResult GetCompanyControllerOptions()
+    {
+        // Retrieves the name of the current controller (e.g, "ExampleController" -> "Example").
+        var controllerName = ControllerContext.ActionDescriptor.ControllerName;
+
+        // Get all API descriptions for the actions in the application, filtering by the current controller. 
+        var apiDescriptions = _apiDescriptionGroupCollectionProvider.ApiDescriptionGroups.Items
+            .SelectMany(apiDescriptionGroup => apiDescriptionGroup.Items)
+            .Where(apiDescription => apiDescription.ActionDescriptor.RouteValues["controller"] == controllerName);
+
+        // Extract and remove duplicate supported HTTP methods for the current controller.
+        var supportedMethods = apiDescriptions
+            .Select(description => description.HttpMethod)
+            .Distinct()
+            .ToArray();
+
+        Response.Headers.Append("Allow", string.Join(", ", supportedMethods));
+
+        return Ok();
     }
 
     /// <summary>
