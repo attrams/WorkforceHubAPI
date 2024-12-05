@@ -1,9 +1,6 @@
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Formatters;
-using Microsoft.Extensions.Options;
 using Serilog;
-using WorkforceHubAPI.Contracts;
 using WorkforceHubAPI.WebAPI;
 using WorkforceHubAPI.WebAPI.Extensions;
 using WorkforceHubAPI.WebAPI.Formatters;
@@ -72,6 +69,8 @@ builder
     .AddXmlDataContractSerializerFormatters()
     .AddCustomCSVFormatter()
     .AddApplicationPart(typeof(WorkforceHubAPI.WebAPI.Presentation.AssemblyReference).Assembly);
+
+builder.Services.ConfigureVersioning();
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();

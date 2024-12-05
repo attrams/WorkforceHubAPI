@@ -5,6 +5,8 @@ using WorkforceHubAPI.Repository;
 using WorkforceHubAPI.Service;
 using WorkforceHubAPI.Service.Contracts;
 using WorkforceHubAPI.WebAPI.Formatters;
+using Asp.Versioning;
+using WorkforceHubAPI.WebAPI.Presentation.Controllers;
 
 namespace WorkforceHubAPI.WebAPI.Extensions;
 
@@ -90,4 +92,20 @@ public static class ServiceExtensions
     public static IMvcBuilder AddCustomCSVFormatter(this IMvcBuilder builder) => builder.AddMvcOptions(
         config => config.OutputFormatters.Add(new CsvOutputFormatter())
     );
+
+    public static void ConfigureVersioning(this IServiceCollection services)
+    {
+        services.AddApiVersioning(options =>
+        {
+            options.ReportApiVersions = true;
+            options.AssumeDefaultVersionWhenUnspecified = true;
+            options.DefaultApiVersion = new ApiVersion(1, 0);
+            options.ApiVersionReader = new HeaderApiVersionReader("api-version");
+        }).AddMvc(options =>
+        {
+            options.Conventions.Controller<CompanyController>().HasApiVersion(new ApiVersion(1, 0));
+            options.Conventions.Controller<EmployeeController>().HasApiVersion(new ApiVersion(1, 0));
+            options.Conventions.Controller<CompanyV2Controller>().HasDeprecatedApiVersion(new ApiVersion(2, 0));
+        });
+    }
 }
