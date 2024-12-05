@@ -73,6 +73,7 @@ public class EmployeeController : ControllerBase
     /// The response includes a collection of employee data, paginated and filtered according to the provided <paramref name="employeeParameters"/>.
     /// </remarks>
     [HttpGet]
+    [HttpHead]
     public async Task<IActionResult> GetEmployeesForCompany(string companyId, [FromQuery] EmployeeParameters employeeParameters)
     {
         var (employees, metaData) = await _service.EmployeeService.GetEmployeesAsync(companyId, employeeParameters, trackChanges: false);
