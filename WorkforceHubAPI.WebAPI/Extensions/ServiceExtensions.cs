@@ -117,8 +117,12 @@ public static class ServiceExtensions
     /// Configures response caching for the application.
     /// </summary>
     /// <param name="services">The <see cref="IServiceCollection"/> to configure.</param>
-    public static void ConfigureResponseCaching(this IServiceCollection services)
+    public static void ConfigureOutputCaching(this IServiceCollection services)
     {
-        services.AddResponseCaching();
+        services.AddOutputCache(options =>
+        {
+            // options.AddBasePolicy(basePolicy => basePolicy.Expire(TimeSpan.FromSeconds(10)));
+            options.AddPolicy("120SecondsDuration", policy => policy.Expire(TimeSpan.FromSeconds(120)));
+        });
     }
 }

@@ -65,7 +65,7 @@ builder
         config.RespectBrowserAcceptHeader = true;
         config.ReturnHttpNotAcceptable = true;
         config.InputFormatters.Insert(0, JsonPatchInputFormatter.GetJsonPatchInputFormatter());
-        config.CacheProfiles.Add("120SecondsDuration", new CacheProfile { Duration = 120 });
+        // config.CacheProfiles.Add("120SecondsDuration", new CacheProfile { Duration = 120 });
     })
     .AddXmlDataContractSerializerFormatters()
     .AddCustomCSVFormatter()
@@ -73,7 +73,7 @@ builder
 
 builder.Services.ConfigureVersioning();
 
-builder.Services.ConfigureResponseCaching();
+builder.Services.ConfigureOutputCaching();
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
@@ -97,7 +97,7 @@ app.UseForwardedHeaders(new ForwardedHeadersOptions { ForwardedHeaders = Forward
 
 app.UseCors("CorsPolicy");
 
-app.UseResponseCaching();
+app.UseOutputCache();
 
 app.UseAuthorization();
 
