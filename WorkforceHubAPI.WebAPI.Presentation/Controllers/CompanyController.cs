@@ -16,6 +16,7 @@ namespace WorkforceHubAPI.WebAPI.Presentation.Controllers;
 /// </summary>
 [Route("api/companies")]
 [ApiController]
+[ResponseCache(CacheProfileName = "120SecondsDuration")]
 public class CompanyController : ControllerBase
 {
     private readonly IServiceManager _service;
@@ -89,6 +90,7 @@ public class CompanyController : ControllerBase
     /// <param name="id">The unique identifier of the company to retrieve.</param>
     /// <returns>An <see cref="IActionResult"/> containing the company data transfer object (DTO) if found.</returns>
     [HttpGet("{id}", Name = "CompanyById")]
+    [ResponseCache(Duration = 60)]
     public async Task<IActionResult> GetCompany(string id)
     {
         var company = await _service.CompanyService.GetCompanyAsync(id, trackChanges: false);

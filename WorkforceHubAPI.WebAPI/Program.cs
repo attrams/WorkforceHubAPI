@@ -65,12 +65,15 @@ builder
         config.RespectBrowserAcceptHeader = true;
         config.ReturnHttpNotAcceptable = true;
         config.InputFormatters.Insert(0, JsonPatchInputFormatter.GetJsonPatchInputFormatter());
+        config.CacheProfiles.Add("120SecondsDuration", new CacheProfile { Duration = 120 });
     })
     .AddXmlDataContractSerializerFormatters()
     .AddCustomCSVFormatter()
     .AddApplicationPart(typeof(WorkforceHubAPI.WebAPI.Presentation.AssemblyReference).Assembly);
 
 builder.Services.ConfigureVersioning();
+
+builder.Services.ConfigureResponseCaching();
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
@@ -93,6 +96,8 @@ app.UseStaticFiles();
 app.UseForwardedHeaders(new ForwardedHeadersOptions { ForwardedHeaders = ForwardedHeaders.All });
 
 app.UseCors("CorsPolicy");
+
+app.UseResponseCaching();
 
 app.UseAuthorization();
 

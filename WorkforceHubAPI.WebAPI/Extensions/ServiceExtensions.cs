@@ -93,6 +93,10 @@ public static class ServiceExtensions
         config => config.OutputFormatters.Add(new CsvOutputFormatter())
     );
 
+    /// <summary>
+    /// Configures API versioning for the application by defining default and supported API versions.
+    /// </summary>
+    /// <param name="services">The <see cref="IServiceCollection"/> to configure.</param>
     public static void ConfigureVersioning(this IServiceCollection services)
     {
         services.AddApiVersioning(options =>
@@ -107,5 +111,14 @@ public static class ServiceExtensions
             options.Conventions.Controller<EmployeeController>().HasApiVersion(new ApiVersion(1, 0));
             options.Conventions.Controller<CompanyV2Controller>().HasDeprecatedApiVersion(new ApiVersion(2, 0));
         });
+    }
+
+    /// <summary>
+    /// Configures response caching for the application.
+    /// </summary>
+    /// <param name="services">The <see cref="IServiceCollection"/> to configure.</param>
+    public static void ConfigureResponseCaching(this IServiceCollection services)
+    {
+        services.AddResponseCaching();
     }
 }
