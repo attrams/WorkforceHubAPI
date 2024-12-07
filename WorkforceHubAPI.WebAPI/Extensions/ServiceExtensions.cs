@@ -7,6 +7,8 @@ using WorkforceHubAPI.Service.Contracts;
 using WorkforceHubAPI.WebAPI.Formatters;
 using Asp.Versioning;
 using WorkforceHubAPI.WebAPI.Presentation.Controllers;
+using System.Threading.RateLimiting;
+using WorkforceHubAPI.Entities.ErrorModel;
 
 namespace WorkforceHubAPI.WebAPI.Extensions;
 
@@ -123,6 +125,57 @@ public static class ServiceExtensions
         {
             // options.AddBasePolicy(basePolicy => basePolicy.Expire(TimeSpan.FromSeconds(10)));
             options.AddPolicy("120SecondsDuration", policy => policy.Expire(TimeSpan.FromSeconds(120)));
+        });
+    }
+
+    /// <summary>
+    /// Configures rate limiting options for the application.
+    /// </summary>
+    /// <param name="services">The <see cref="IServiceCollection"/> to add the rate limiter configuration to.</param>
+    public static void ConfigureRateLimitingOptions(this IServiceCollection services)
+    {
+        // Add a global rate limiter with a fixed window policy. 
+        services.AddRateLimiter(options =>
+        {
+            // Define a global limiter with a maximum of 10 requests per minute
+            options.GlobalLimiter = PartitionedRateLimiter.Create<HttpContext, string>(context =>
+                RateLimitPartition.GetFixedWindowLimiter("GlobalLimiter", partition => new FixedWindowRateLimiterOptions
+                {
+                    AutoReplenishment = true,
+                    PermitLimit = 20,
+                    QueueLimit = 0,
+                    Window = TimeSpan.FromMinutes(1)
+                })
+            );
+
+            // Handle requests that exceed the rate limit.
+            options.OnRejected = async (context, token) =>
+            {
+                context.HttpContext.Response.StatusCode = StatusCodes.Status429TooManyRequests;
+
+                if (context.Lease.TryGetMetadata(MetadataName.RetryAfter, out var retryAfter))
+                {
+                    await context.HttpContext.Response.WriteAsJsonAsync(
+                        new ErrorDetails
+                        {
+                            StatusCode = context.HttpContext.Response.StatusCode,
+                            Message = $"Too many requests. Please try again after {retryAfter.TotalSeconds} second(s)."
+                        },
+                        token
+                    );
+                }
+                else
+                {
+                    await context.HttpContext.Response.WriteAsJsonAsync(
+                        new ErrorDetails
+                        {
+                            StatusCode = context.HttpContext.Response.StatusCode,
+                            Message = "Too many requests. Please try again later."
+                        },
+                        token
+                    );
+                }
+            };
         });
     }
 }

@@ -75,6 +75,8 @@ builder.Services.ConfigureVersioning();
 
 builder.Services.ConfigureOutputCaching();
 
+builder.Services.ConfigureRateLimitingOptions();
+
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
@@ -94,6 +96,8 @@ app.UseHttpsRedirection();
 app.UseStaticFiles();
 
 app.UseForwardedHeaders(new ForwardedHeadersOptions { ForwardedHeaders = ForwardedHeaders.All });
+
+app.UseRateLimiter();
 
 app.UseCors("CorsPolicy");
 
