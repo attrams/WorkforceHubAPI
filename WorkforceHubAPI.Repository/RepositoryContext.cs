@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using WorkforceHubAPI.Entities.Models;
 using WorkforceHubAPI.Repository.Configuration;
@@ -11,7 +12,7 @@ namespace WorkforceHubAPI.Repository;
 /// The <see cref="RepositoryContext"/> class is responsible for interacting with the database.
 /// It defines the DbSet properties for the applications's domain models and is configured using Entity Framework Core.
 /// </remarks>
-public class RepositoryContext : DbContext
+public class RepositoryContext : IdentityDbContext<User>
 {
     /// <summary>
     /// Initializes a new instance of the <see cref="RepositoryContext"/> class.
@@ -23,13 +24,15 @@ public class RepositoryContext : DbContext
     public RepositoryContext(DbContextOptions options)
         : base(options) { }
 
-    // Override the OnModelCreating method to apply configurations and seed data for the entities.
-    // Both CompanyConfiguration and EmployeeConfiguration add seed data to their respective tables.
+    /// Override the OnModelCreating method to apply configurations and seed data for the entities.
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        // Apply configurations and seed data for Company and Employee entities.
+        base.OnModelCreating(modelBuilder);
+
+        // Apply configurations and seed data for Company, Employee and Role entities.
         modelBuilder.ApplyConfiguration(new CompanyConfiguration());
         modelBuilder.ApplyConfiguration(new EmployeeConfiguration());
+        modelBuilder.ApplyConfiguration(new RoleConfiguration());
     }
 
     /// <summary>

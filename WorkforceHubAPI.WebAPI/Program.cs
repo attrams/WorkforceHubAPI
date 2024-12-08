@@ -77,6 +77,10 @@ builder.Services.ConfigureOutputCaching();
 
 builder.Services.ConfigureRateLimitingOptions();
 
+builder.Services.AddAuthentication();
+
+builder.Services.ConfigureIdentity();
+
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
@@ -102,6 +106,8 @@ app.UseRateLimiter();
 app.UseCors("CorsPolicy");
 
 app.UseOutputCache();
+
+app.UseAuthentication();
 
 app.UseAuthorization();
 

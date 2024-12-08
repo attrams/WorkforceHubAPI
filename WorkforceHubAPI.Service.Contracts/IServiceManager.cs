@@ -15,4 +15,9 @@ public interface IServiceManager
     /// Gets the service instance for business logic operations related to the Employee entity.
     /// </summary>
     IEmployeeService EmployeeService { get; }
+
+    /// <summary>
+    ///  Gets the service instance for business logic operations related to the Authentication.
+    /// </summary>
+    IAuthenticationService AuthenticationService { get; }
 }

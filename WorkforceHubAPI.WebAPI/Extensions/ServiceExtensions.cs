@@ -9,6 +9,8 @@ using Asp.Versioning;
 using WorkforceHubAPI.WebAPI.Presentation.Controllers;
 using System.Threading.RateLimiting;
 using WorkforceHubAPI.Entities.ErrorModel;
+using WorkforceHubAPI.Entities.Models;
+using Microsoft.AspNetCore.Identity;
 
 namespace WorkforceHubAPI.WebAPI.Extensions;
 
@@ -177,5 +179,24 @@ public static class ServiceExtensions
                 }
             };
         });
+    }
+
+    /// <summary>
+    /// Configures ASP.NET Core Identity for the application.
+    /// </summary>
+    /// <param name="services">The <see cref="IServiceCollection"/> to which Identity services will be added.</param>
+    public static void ConfigureIdentity(this IServiceCollection services)
+    {
+        var builder = services.AddIdentity<User, IdentityRole>(options =>
+        {
+            options.Password.RequireDigit = true;
+            options.Password.RequireLowercase = false;
+            options.Password.RequireUppercase = false;
+            options.Password.RequireNonAlphanumeric = false;
+            options.Password.RequiredLength = 10;
+            options.User.RequireUniqueEmail = true;
+        })
+        .AddEntityFrameworkStores<RepositoryContext>()
+        .AddDefaultTokenProviders();
     }
 }

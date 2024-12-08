@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using WorkforceHubAPI.Repository;
 
@@ -11,9 +12,11 @@ using WorkforceHubAPI.Repository;
 namespace WorkforceHubAPI.WebAPI.Migrations
 {
     [DbContext(typeof(RepositoryContext))]
-    partial class RepositoryContextModelSnapshot : ModelSnapshot
+    [Migration("20241207180303_CreateIdentityTables")]
+    partial class CreateIdentityTables
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -51,13 +54,13 @@ namespace WorkforceHubAPI.WebAPI.Migrations
                     b.HasData(
                         new
                         {
-                            Id = "456ac4f6-d40a-437b-ad56-02dc4ca48af4",
+                            Id = "7251d5fa-2f73-49d5-8443-4ef2924bc16c",
                             Name = "Manager",
                             NormalizedName = "MANAGER"
                         },
                         new
                         {
-                            Id = "3e0eed4f-1476-4ca7-9f5a-bc4cf6dc7f27",
+                            Id = "5f79f0e3-79f1-4e1c-9255-7cb963464c7a",
                             Name = "Administrator",
                             NormalizedName = "ADMINISTRATOR"
                         });
