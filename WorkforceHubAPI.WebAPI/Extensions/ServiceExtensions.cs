@@ -1,16 +1,20 @@
-using Microsoft.EntityFrameworkCore;
 using WorkforceHubAPI.Contracts;
 using WorkforceHubAPI.LoggerService;
 using WorkforceHubAPI.Repository;
 using WorkforceHubAPI.Service;
 using WorkforceHubAPI.Service.Contracts;
 using WorkforceHubAPI.WebAPI.Formatters;
-using Asp.Versioning;
-using WorkforceHubAPI.WebAPI.Presentation.Controllers;
-using System.Threading.RateLimiting;
 using WorkforceHubAPI.Entities.ErrorModel;
 using WorkforceHubAPI.Entities.Models;
+using WorkforceHubAPI.WebAPI.Presentation.Controllers;
+
+using Microsoft.EntityFrameworkCore;
+using Asp.Versioning;
+using System.Threading.RateLimiting;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
 
 namespace WorkforceHubAPI.WebAPI.Extensions;
 
@@ -198,5 +202,49 @@ public static class ServiceExtensions
         })
         .AddEntityFrameworkStores<RepositoryContext>()
         .AddDefaultTokenProviders();
+    }
+
+    /// <summary>
+    /// Configures JWT authentication for the application.
+    /// </summary>
+    /// <param name="services">The <see cref="IServiceCollection"/> to add the authentication services to.</param>
+    /// <param name="configuration">The application's configuration used to retrieve JWT settings.</param>
+    /// <remarks>
+    /// Ensure the configuration contains a "JwtSettings" section with the following keys:
+    /// <para> - SecretKey: The secret key for signing tokens.</para>
+    /// <para> - ValidIssuer: The expected issuer of the token.</para>
+    /// <para> - ValidAudience: The expected audience of the token.</para>
+    /// Example configuration in appsettings.json:
+    /// <code>
+    /// "JwtSettings": {
+    ///     "SecretKey": "your-secret-key",
+    ///     "ValidIssuer": "your-issuer",
+    ///     "ValidAudience": "your-audience"
+    /// }
+    /// </code>
+    /// </remarks>
+    public static void ConfigureJWT(this IServiceCollection services, IConfiguration configuration)
+    {
+        var jwtSettings = configuration.GetSection("JwtSettings");
+        var secretKey = jwtSettings["SecretKey"]!;
+
+        services.AddAuthentication(options =>
+        {
+            options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+            options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+        })
+        .AddJwtBearer(options =>
+        {
+            options.TokenValidationParameters = new TokenValidationParameters
+            {
+                ValidateIssuer = true,
+                ValidateAudience = true,
+                ValidateLifetime = true,
+                ValidateIssuerSigningKey = true,
+                ValidIssuer = jwtSettings["ValidIssuer"],
+                ValidAudience = jwtSettings["ValidAudience"],
+                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey))
+            };
+        });
     }
 }
