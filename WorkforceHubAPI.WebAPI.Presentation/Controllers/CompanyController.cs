@@ -76,7 +76,7 @@ public class CompanyController : ControllerBase
     /// are included in the response.
     /// </remarks>
     [HttpGet]
-    [Authorize]
+    [Authorize(Roles = "Manager")]
     public async Task<IActionResult> GetCompanies([FromQuery] CompanyParameters companyParameters)
     {
         var (companies, metaData) = await _service.CompanyService.GetAllCompaniesAsync(companyParameters, trackChanges: false);

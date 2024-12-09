@@ -1,4 +1,6 @@
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using WorkforceHubAPI.Entities.ErrorModel;
 using WorkforceHubAPI.Service.Contracts;
 using WorkforceHubAPI.Shared.DataTransferObjects;
 using WorkforceHubAPI.WebAPI.Presentation.ActionFilters;
@@ -45,5 +47,26 @@ public class AuthenticationController : ControllerBase
         }
 
         return StatusCode(201);
+    }
+
+    /// <summary>
+    /// Authenticate a user and generate a JWT token upon successful validation
+    /// </summary>
+    /// <param name="user">The <see cref="UserForAuthenticationDto"/> containing the user's credentials.</param>
+    /// <returns>
+    /// An <see cref="IActionResult"/> representing the result of the authentication process:
+    ///     <para> - Returns <see cref="UnAuthorizedResult"/> if the user validation fails.</para>
+    ///     <para> - Returns <see cref="OkObjectResult"/> with a generated JWT if authentication is successful.</para>
+    /// </returns>
+    [HttpPost("login")]
+    [ServiceFilter(typeof(ValidationFilterAttribute))]
+    public async Task<IActionResult> Authenticate([FromBody] UserForAuthenticationDto user)
+    {
+        if (!await _service.AuthenticationService.ValidateUser(user))
+        {
+            return Unauthorized(new ErrorDetails { StatusCode = StatusCodes.Status401Unauthorized, Message = "Invalid username or password." });
+        }
+
+        return Ok(new { Token = await _service.AuthenticationService.CreateToken() });
     }
 }

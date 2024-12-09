@@ -17,4 +17,23 @@ public interface IAuthenticationService
     /// indicating the result of the registration operation.
     /// </returns>
     Task<IdentityResult> RegisterUser(UserForRegistrationDto userForRegistration);
+
+    /// <summary>
+    /// Validates the provided user credentials.
+    /// </summary>
+    /// <param name="userForAuth">The <see cref="UserForAuthenticationDto"/> containing user credentials.</param>
+    /// <returns>
+    /// A <see cref="Task"/> representing the asynchronous operation. The task result is a boolean indicating whether
+    /// the user credentials are valid.
+    /// </returns>
+    Task<bool> ValidateUser(UserForAuthenticationDto userForAuth);
+
+    /// <summary>
+    /// Creates a JWT token for the authenticated user.
+    /// </summary>
+    /// <returns>
+    /// A <see cref="Task"/> representing the asynchronous operation. The task result is a string containing the 
+    /// generated JWT token.
+    /// </returns>
+    Task<string> CreateToken();
 }
