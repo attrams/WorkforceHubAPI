@@ -1,12 +1,14 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <ItemGroup>
-    <ProjectReference Include="..\WorkforceHubAPI.Service.Contracts\WorkforceHubAPI.Service.Contracts.csproj" />
+    <ProjectReference
+      Include="..\WorkforceHubAPI.Service.Contracts\WorkforceHubAPI.Service.Contracts.csproj" />
     <ProjectReference Include="..\WorkforceHubAPI.Contracts\WorkforceHubAPI.Contracts.csproj" />
   </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="AutoMapper" Version="13.0.1" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="9.0.0" />
     <PackageReference Include="Microsoft.IdentityModel.JsonWebTokens" Version="8.0.1" />
   </ItemGroup>
 

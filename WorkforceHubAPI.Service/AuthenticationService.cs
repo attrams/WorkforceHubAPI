@@ -3,6 +3,7 @@ using WorkforceHubAPI.Entities.Exceptions;
 using WorkforceHubAPI.Entities.Models;
 using WorkforceHubAPI.Service.Contracts;
 using WorkforceHubAPI.Shared.DataTransferObjects;
+using WorkforceHubAPI.Entities.ConfigurationModels;
 
 using System.Security.Claims;
 using System.Text;
@@ -25,6 +26,7 @@ internal sealed class AuthenticationService : IAuthenticationService
     private readonly UserManager<User> _userManager;
     private readonly RoleManager<IdentityRole> _roleManager;
     private readonly IConfiguration _configuration;
+    private readonly JwtConfiguration _jwtConfiguration;
     private User? _user;
 
     public AuthenticationService(
@@ -40,6 +42,8 @@ internal sealed class AuthenticationService : IAuthenticationService
         _userManager = userManager;
         _roleManager = roleManager;
         _configuration = configuration;
+        _jwtConfiguration = new JwtConfiguration();
+        _configuration.Bind(_jwtConfiguration.Section, _jwtConfiguration);
     }
 
     /// <inheritdoc/>
@@ -132,7 +136,7 @@ internal sealed class AuthenticationService : IAuthenticationService
     /// </returns>
     private SigningCredentials GetSigningCredentials()
     {
-        var key = Encoding.UTF8.GetBytes(_configuration.GetSection("JwtSettings")["SecretKey"]!);
+        var key = Encoding.UTF8.GetBytes(_jwtConfiguration.SecretKey!);
         var secret = new SymmetricSecurityKey(key);
 
         return new SigningCredentials(secret, SecurityAlgorithms.HmacSha256);
@@ -172,14 +176,12 @@ internal sealed class AuthenticationService : IAuthenticationService
     /// </returns>
     private SecurityTokenDescriptor GenerateTokenOptions(SigningCredentials signingCredentials, Dictionary<string, object> claims)
     {
-        var jwtSettings = _configuration.GetSection("JwtSettings");
-
         var tokenOptions = new SecurityTokenDescriptor
         {
-            Issuer = jwtSettings["ValidIssuer"],
-            Audience = jwtSettings["ValidAudience"],
+            Issuer = _jwtConfiguration.ValidIssuer,
+            Audience = _jwtConfiguration.ValidAudience,
             Claims = claims,
-            Expires = DateTime.Now.AddMinutes(Convert.ToDouble(jwtSettings["Expires"])),
+            Expires = DateTime.Now.AddMinutes(Convert.ToDouble(_jwtConfiguration.Expires)),
             SigningCredentials = signingCredentials
         };
 
@@ -217,17 +219,15 @@ internal sealed class AuthenticationService : IAuthenticationService
     /// </remarks>
     private async Task<ClaimsPrincipal> GetPrincipalFromExpiredToken(string token)
     {
-        var jwtSettings = _configuration.GetSection("JwtSettings");
-
         var tokenValidationParameters = new TokenValidationParameters
         {
             ValidateAudience = true,
             ValidateIssuer = true,
             ValidateIssuerSigningKey = true,
-            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration.GetSection("JwtSettings")["SecretKey"]!)),
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtConfiguration.SecretKey!)),
             ValidateLifetime = true,
-            ValidIssuer = jwtSettings["ValidIssuer"],
-            ValidAudience = jwtSettings["ValidAudience"]
+            ValidIssuer = _jwtConfiguration.ValidIssuer,
+            ValidAudience = _jwtConfiguration.ValidAudience
         };
 
         var tokenHandler = new JsonWebTokenHandler();

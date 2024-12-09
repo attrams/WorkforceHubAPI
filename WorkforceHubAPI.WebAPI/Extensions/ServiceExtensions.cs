@@ -7,6 +7,7 @@ using WorkforceHubAPI.WebAPI.Formatters;
 using WorkforceHubAPI.Entities.ErrorModel;
 using WorkforceHubAPI.Entities.Models;
 using WorkforceHubAPI.WebAPI.Presentation.Controllers;
+using WorkforceHubAPI.Entities.ConfigurationModels;
 
 using Microsoft.EntityFrameworkCore;
 using Asp.Versioning;
@@ -219,14 +220,15 @@ public static class ServiceExtensions
     /// "JwtSettings": {
     ///     "SecretKey": "your-secret-key",
     ///     "ValidIssuer": "your-issuer",
-    ///     "ValidAudience": "your-audience"
+    ///     "ValidAudience": "your-audience",
+    ///     "Expires": integer representing token expiration
     /// }
     /// </code>
     /// </remarks>
     public static void ConfigureJWT(this IServiceCollection services, IConfiguration configuration)
     {
-        var jwtSettings = configuration.GetSection("JwtSettings");
-        var secretKey = jwtSettings["SecretKey"]!;
+        var jwtConfiguration = new JwtConfiguration();
+        configuration.Bind(jwtConfiguration.Section, jwtConfiguration);
 
         services.AddAuthentication(options =>
         {
@@ -241,9 +243,9 @@ public static class ServiceExtensions
                 ValidateAudience = true,
                 ValidateLifetime = true,
                 ValidateIssuerSigningKey = true,
-                ValidIssuer = jwtSettings["ValidIssuer"],
-                ValidAudience = jwtSettings["ValidAudience"],
-                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey))
+                ValidIssuer = jwtConfiguration.ValidIssuer,
+                ValidAudience = jwtConfiguration.ValidAudience,
+                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtConfiguration.SecretKey!))
             };
         });
     }
