@@ -29,11 +29,19 @@ public interface IAuthenticationService
     Task<bool> ValidateUser(UserForAuthenticationDto userForAuth);
 
     /// <summary>
-    /// Creates a JWT token for the authenticated user.
+    /// Creates and returns a new JWT access token and a refresh token for the authenticated user.
     /// </summary>
+    /// <param name="populateExp">A boolean indicating whether to populate the refresh token's expiration.</param>
     /// <returns>
-    /// A <see cref="Task"/> representing the asynchronous operation. The task result is a string containing the 
-    /// generated JWT token.
+    /// A <see cref="Task"/> representing the asynchronous operation. The task result contains a <see cref="TokenDto"/> with
+    /// the access token and refresh token.
     /// </returns>
-    Task<string> CreateToken();
+    Task<TokenDto> CreateToken(bool populateExp);
+
+    /// <summary>
+    /// Refreshes access token using a valid refresh token.
+    /// </summary>
+    /// <param name="tokenDto">A Data Transfer Object containing the access token and refresh token.</param>
+    /// <returns>A new <see cref="TokenDto"/> containing a refreshed access and refresh tokens.</returns>
+    Task<TokenDto> RefreshToken(TokenDto tokenDto);
 }

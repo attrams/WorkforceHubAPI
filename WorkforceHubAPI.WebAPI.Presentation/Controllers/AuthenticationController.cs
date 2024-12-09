@@ -56,7 +56,7 @@ public class AuthenticationController : ControllerBase
     /// <returns>
     /// An <see cref="IActionResult"/> representing the result of the authentication process:
     ///     <para> - Returns <see cref="UnAuthorizedResult"/> if the user validation fails.</para>
-    ///     <para> - Returns <see cref="OkObjectResult"/> with a generated JWT if authentication is successful.</para>
+    ///     <para> - Returns <see cref="OkObjectResult"/> with a generated access and refresh tokens if authentication is successful.</para>
     /// </returns>
     [HttpPost("login")]
     [ServiceFilter(typeof(ValidationFilterAttribute))]
@@ -67,6 +67,8 @@ public class AuthenticationController : ControllerBase
             return Unauthorized(new ErrorDetails { StatusCode = StatusCodes.Status401Unauthorized, Message = "Invalid username or password." });
         }
 
-        return Ok(new { Token = await _service.AuthenticationService.CreateToken() });
+        var tokenDto = await _service.AuthenticationService.CreateToken(populateExp: true);
+
+        return Ok(tokenDto);
     }
 }
