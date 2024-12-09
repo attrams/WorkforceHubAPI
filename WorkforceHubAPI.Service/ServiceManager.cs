@@ -1,7 +1,8 @@
 using AutoMapper;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Options;
 using WorkforceHubAPI.Contracts;
+using WorkforceHubAPI.Entities.ConfigurationModels;
 using WorkforceHubAPI.Entities.Models;
 using WorkforceHubAPI.Service.Contracts;
 
@@ -28,7 +29,7 @@ public sealed class ServiceManager : IServiceManager
         IMapper mapper,
         UserManager<User> userManager,
         RoleManager<IdentityRole> roleManager,
-        IConfiguration configuration
+        IOptions<JwtConfiguration> configuration
     )
     {
         _companyService = new Lazy<ICompanyService>(

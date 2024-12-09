@@ -249,4 +249,15 @@ public static class ServiceExtensions
             };
         });
     }
+
+    /// <summary>
+    /// Adds the JWT configuration settings to the service collection. Binds the "JwtSettings" section from
+    /// the application's configuration file to the <see cref="JwtConfiguration"/> class.
+    /// </summary>
+    /// <param name="services">The service collection to which the configuration is added.</param>
+    /// <param name="configuration">The application configuration from the "JwtSettings" section is read.</param>
+    public static void AddJwtConfiguration(this IServiceCollection services, IConfiguration configuration)
+    {
+        services.Configure<JwtConfiguration>(configuration.GetSection("JwtSettings"));
+    }
 }

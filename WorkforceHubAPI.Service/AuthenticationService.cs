@@ -9,10 +9,10 @@ using System.Security.Claims;
 using System.Text;
 using AutoMapper;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.IdentityModel.JsonWebTokens;
 using System.Security.Cryptography;
+using Microsoft.Extensions.Options;
 
 namespace WorkforceHubAPI.Service;
 
@@ -25,7 +25,7 @@ internal sealed class AuthenticationService : IAuthenticationService
     private readonly IMapper _mapper;
     private readonly UserManager<User> _userManager;
     private readonly RoleManager<IdentityRole> _roleManager;
-    private readonly IConfiguration _configuration;
+    private readonly IOptions<JwtConfiguration> _configuration;
     private readonly JwtConfiguration _jwtConfiguration;
     private User? _user;
 
@@ -34,7 +34,7 @@ internal sealed class AuthenticationService : IAuthenticationService
         IMapper mapper,
         UserManager<User> userManager,
         RoleManager<IdentityRole> roleManager,
-        IConfiguration configuration
+        IOptions<JwtConfiguration> configuration
     )
     {
         _logger = logger;
@@ -42,8 +42,7 @@ internal sealed class AuthenticationService : IAuthenticationService
         _userManager = userManager;
         _roleManager = roleManager;
         _configuration = configuration;
-        _jwtConfiguration = new JwtConfiguration();
-        _configuration.Bind(_jwtConfiguration.Section, _jwtConfiguration);
+        _jwtConfiguration = _configuration.Value;
     }
 
     /// <inheritdoc/>
