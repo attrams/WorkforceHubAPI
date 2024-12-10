@@ -1,3 +1,4 @@
+using System.Net.Mime;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
@@ -40,6 +41,7 @@ public class AuthenticationController : ControllerBase
     /// </returns>
     [HttpPost]
     [ServiceFilter(typeof(ValidationFilterAttribute))]
+    [Consumes(MediaTypeNames.Application.Json)]
     public async Task<IActionResult> RegisterUser([FromBody] UserForRegistrationDto userForRegistration)
     {
         var result = await _service.AuthenticationService.RegisterUser(userForRegistration);
@@ -68,6 +70,7 @@ public class AuthenticationController : ControllerBase
     /// </returns>
     [HttpPost("login")]
     [ServiceFilter(typeof(ValidationFilterAttribute))]
+    [Consumes(MediaTypeNames.Application.Json)]
     public async Task<IActionResult> Authenticate([FromBody] UserForAuthenticationDto user)
     {
         if (!await _service.AuthenticationService.ValidateUser(user))

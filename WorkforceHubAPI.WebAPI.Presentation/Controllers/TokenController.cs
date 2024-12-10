@@ -1,3 +1,4 @@
+using System.Net.Mime;
 using Microsoft.AspNetCore.Mvc;
 using WorkforceHubAPI.Service.Contracts;
 using WorkforceHubAPI.Shared.DataTransferObjects;
@@ -32,6 +33,7 @@ public class TokenController : ControllerBase
     /// <returns>An <see cref="IActionResult"/> containing the refreshed token data.</returns>
     [HttpPost("refresh")]
     [ServiceFilter(typeof(ValidationFilterAttribute))]
+    [Consumes(MediaTypeNames.Application.Json)]
     public async Task<IActionResult> Refresh([FromBody] TokenDto tokenDto)
     {
         var tokenDtoToReturn = await _service.AuthenticationService.RefreshToken(tokenDto);

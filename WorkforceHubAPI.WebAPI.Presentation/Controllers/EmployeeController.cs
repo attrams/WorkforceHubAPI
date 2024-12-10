@@ -1,3 +1,4 @@
+using System.Net.Mime;
 using System.Text.Json;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.JsonPatch;
@@ -112,6 +113,7 @@ public class EmployeeController : ControllerBase
     /// <returns>A response with the created employee data, including a URI to access the newly created employee's details.</returns>
     [HttpPost]
     [ServiceFilter(typeof(ValidationFilterAttribute))]
+    [Consumes(MediaTypeNames.Application.Json)]
     public async Task<IActionResult> CreateEmployeeForCompany(string companyId, [FromBody] EmployeeForCreationDto employee)
     {
         var employeeToReturn = await _service.EmployeeService.CreateEmployeeForCompanyAsync(companyId, employee, trackChanges: false);
@@ -143,6 +145,7 @@ public class EmployeeController : ControllerBase
     /// <returns>Returns a 204 No Content response if the employee is successfully updated.</returns>
     [HttpPut("{employeeId}")]
     [ServiceFilter(typeof(ValidationFilterAttribute))]
+    [Consumes(MediaTypeNames.Application.Json)]
     public async Task<IActionResult> UpdateEmployeeForCompany(string companyId, string employeeId, [FromBody] EmployeeForUpdateDto employee)
     {
         await _service.EmployeeService.UpdateEmployeeForCompanyAsync(companyId, employeeId, employee, trackCompanyChanges: false, trackEmployeeChanges: true);
@@ -158,6 +161,7 @@ public class EmployeeController : ControllerBase
     /// <param name="patchDocument">The JSON Patch document containing the changes.</param>
     /// <returns>A 204 No Content response if the update is successful or a `BadRequest` response if the patch document is null.</returns>
     [HttpPatch("{employeeId}")]
+    [Consumes(MediaTypeNames.Application.JsonPatch)]
     public async Task<IActionResult> PartiallyUpdateEmployeeForCompany(string companyId, string employeeId, [FromBody] JsonPatchDocument<EmployeeForUpdateDto> patchDocument)
     {
         if (patchDocument is null)

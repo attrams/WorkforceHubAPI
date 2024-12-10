@@ -1,3 +1,4 @@
+using System.Net.Mime;
 using System.Text.Json;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -89,6 +90,7 @@ public class CompanyController : ControllerBase
     /// </remarks>
     [HttpGet]
     [Authorize(Roles = "Manager")]
+    [Produces(MediaTypeNames.Application.Json, MediaTypeNames.Text.Csv, MediaTypeNames.Text.Xml)]
     public async Task<IActionResult> GetCompanies([FromQuery] CompanyParameters companyParameters)
     {
         var (companies, metaData) = await _service.CompanyService.GetAllCompaniesAsync(companyParameters, trackChanges: false);
@@ -104,6 +106,7 @@ public class CompanyController : ControllerBase
     /// <param name="id">The unique identifier of the company to retrieve.</param>
     /// <returns>An <see cref="IActionResult"/> containing the company data transfer object (DTO) if found.</returns>
     [HttpGet("{id}", Name = "CompanyById")]
+    [Produces(MediaTypeNames.Application.Json, MediaTypeNames.Text.Csv, MediaTypeNames.Text.Xml)]
     public async Task<IActionResult> GetCompany(string id)
     {
         var company = await _service.CompanyService.GetCompanyAsync(id, trackChanges: false);
@@ -120,6 +123,7 @@ public class CompanyController : ControllerBase
     /// retrieval is successful.
     /// </returns>
     [HttpGet("collection", Name = "CompanyCollection")]
+    [Produces(MediaTypeNames.Application.Json, MediaTypeNames.Text.Csv, MediaTypeNames.Text.Xml)]
     public async Task<IActionResult> GetCompanyCollection([ModelBinder(BinderType = typeof(ArrayModelBinder))] IEnumerable<string> companyIds)
     {
         var companies = await _service.CompanyService.GetByIdsAsync(companyIds, trackChanges: false);
@@ -136,6 +140,7 @@ public class CompanyController : ControllerBase
     /// </returns>
     [HttpPost]
     [ServiceFilter(typeof(ValidationFilterAttribute))]
+    [Consumes(MediaTypeNames.Application.Json)]
     public async Task<IActionResult> CreateCompany([FromBody] CompanyForCreationDto company)
     {
         var createdCompany = await _service.CompanyService.CreateCompanyAsync(company);
@@ -156,6 +161,7 @@ public class CompanyController : ControllerBase
     /// - If the provided company collection is null or empty, returns a `400 Bad Request` response.
     /// </returns>
     [HttpPost("collection")]
+    [Consumes(MediaTypeNames.Application.Json)]
     public async Task<IActionResult> CreateCompanyCollection([FromBody] IEnumerable<CompanyForCreationDto> companyCollection)
     {
         var (companies, companyIds) = await _service.CompanyService.CreateCompanyCollectionAsync(companyCollection);
@@ -187,6 +193,7 @@ public class CompanyController : ControllerBase
     /// <returns>Returns a <see cref="NoContentResult"/> if the update operation is successful.</returns>
     [HttpPut("{companyId}")]
     [ServiceFilter(typeof(ValidationFilterAttribute))]
+    [Consumes(MediaTypeNames.Application.Json)]
     public async Task<IActionResult> UpdateCompany(string companyId, [FromBody] CompanyForUpdateDto company)
     {
         await _service.CompanyService.UpdateCompanyAsync(companyId, company, trackChanges: true);

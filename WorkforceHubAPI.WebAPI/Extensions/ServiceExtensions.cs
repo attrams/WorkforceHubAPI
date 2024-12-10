@@ -260,7 +260,7 @@ public static class ServiceExtensions
             {
                 Title = "WorkforceHub API",
                 Version = "v1",
-                Description = "WorkforceHub API by Workforce",
+                Description = "An ASP.NET Core Web API for managing Companies and Employees",
                 TermsOfService = new Uri("https://example.com/terms"),
                 Contact = new OpenApiContact
                 {
