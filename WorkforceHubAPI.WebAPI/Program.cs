@@ -112,6 +112,13 @@ app.UseCors("CorsPolicy");
 
 app.UseOutputCache();
 
+// Redirect root URL to Swagger UI.
+app.MapGet("/", context =>
+{
+    context.Response.Redirect("/swagger");
+    return Task.CompletedTask;
+});
+
 app.UseAuthentication();
 
 app.UseAuthorization();
