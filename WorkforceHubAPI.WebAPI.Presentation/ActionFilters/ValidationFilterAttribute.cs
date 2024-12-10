@@ -11,6 +11,11 @@ namespace WorkforceHubAPI.WebAPI.Presentation.ActionFilters;
 /// </summary>
 public class ValidationFilterAttribute : IActionFilter
 {
+    /// <summary>
+    /// Initializes a new instance of the <see cref="ValidationFilterAttribute"/> class.
+    /// This parameterless constructor is required to allow the attribute to be applied to 
+    /// controllers or action methods without additional configuration.
+    /// </summary>
     public ValidationFilterAttribute() { }
 
     /// <summary>

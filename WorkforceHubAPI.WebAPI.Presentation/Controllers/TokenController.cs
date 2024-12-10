@@ -14,6 +14,12 @@ public class TokenController : ControllerBase
 {
     private readonly IServiceManager _service;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="TokenController"/> class.
+    /// </summary>
+    /// <param name="service">
+    /// An instance of <see cref="IServiceManager"/> used to manage services related to token generation and authentication operations.
+    /// </param>
     public TokenController(IServiceManager service)
     {
         _service = service;

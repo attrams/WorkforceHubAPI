@@ -21,6 +21,14 @@ public class EmployeeController : ControllerBase
 
     private readonly IApiDescriptionGroupCollectionProvider _apiDescriptionGroupCollectionProvider;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="EmployeeController"/> class.
+    /// </summary>
+    /// <param name="service">An instance of <see cref="IServiceManager"/> used to manage services related to employee operations.</param>
+    /// <param name="apiDescriptionGroupCollectionProvider">
+    /// An instance of <see cref="IApiDescriptionGroupCollectionProvider"/> used to dynamically retrieve actions for the OPTIONS method to 
+    /// avoid hardcoding them.
+    /// </param>
     public EmployeeController(IServiceManager service, IApiDescriptionGroupCollectionProvider apiDescriptionGroupCollectionProvider)
     {
         _service = service;

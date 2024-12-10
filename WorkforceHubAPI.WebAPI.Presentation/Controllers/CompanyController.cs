@@ -26,6 +26,16 @@ public class CompanyController : ControllerBase
 
     private readonly IApiDescriptionGroupCollectionProvider _apiDescriptionGroupCollectionProvider;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="CompanyController"/> class.
+    /// </summary>
+    /// <param name="service">
+    /// An instance of <see cref="IServiceManager"/> used to manage services related to company operations.
+    /// </param>
+    /// <param name="apiDescriptionGroupCollectionProvider">
+    /// An instance of <see cref="IApiDescriptionGroupCollectionProvider"/> used to dynamically retrieve actions for the OPTIONS method in the current
+    /// controller to avoid the need to hardcode them.
+    /// </param>
     public CompanyController(IServiceManager service, IApiDescriptionGroupCollectionProvider apiDescriptionGroupCollectionProvider)
     {
         _service = service;

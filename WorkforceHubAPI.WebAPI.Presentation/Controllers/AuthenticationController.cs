@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using WorkforceHubAPI.Entities.ErrorModel;
 using WorkforceHubAPI.Service.Contracts;
@@ -16,6 +17,13 @@ public class AuthenticationController : ControllerBase
 {
     private readonly IServiceManager _service;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="AuthenticationController"/> class.
+    /// </summary>
+    /// <param name="service">
+    /// An instance of <see cref="IServiceManager"/> used to manage application services
+    /// required for authentication-related operations.
+    /// </param>
     public AuthenticationController(IServiceManager service)
     {
         _service = service;
@@ -55,7 +63,7 @@ public class AuthenticationController : ControllerBase
     /// <param name="user">The <see cref="UserForAuthenticationDto"/> containing the user's credentials.</param>
     /// <returns>
     /// An <see cref="IActionResult"/> representing the result of the authentication process:
-    ///     <para> - Returns <see cref="UnAuthorizedResult"/> if the user validation fails.</para>
+    ///     <para> - Returns <see cref="UnauthorizedObjectResult"/> if the user validation fails.</para>
     ///     <para> - Returns <see cref="OkObjectResult"/> with a generated access and refresh tokens if authentication is successful.</para>
     /// </returns>
     [HttpPost("login")]
