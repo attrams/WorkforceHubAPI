@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ApiExplorer;
 using Microsoft.AspNetCore.OutputCaching;
+
 using WorkforceHubAPI.Service.Contracts;
 using WorkforceHubAPI.Shared.DataTransferObjects;
 using WorkforceHubAPI.Shared.RequestFeatures;
@@ -18,6 +19,7 @@ namespace WorkforceHubAPI.WebAPI.Presentation.Controllers;
 [Route("api/companies")]
 [ApiController]
 [OutputCache(PolicyName = "120SecondsDuration")]
+[ApiExplorerSettings(GroupName = "v1")]
 public class CompanyController : ControllerBase
 {
     private readonly IServiceManager _service;

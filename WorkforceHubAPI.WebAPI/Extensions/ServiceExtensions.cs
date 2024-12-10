@@ -16,6 +16,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using Microsoft.OpenApi.Models;
 
 namespace WorkforceHubAPI.WebAPI.Extensions;
 
@@ -29,24 +30,9 @@ public static class ServiceExtensions
     /// </summary>
     /// <param name="services">The <see cref="IServiceCollection"/> to which the CORS service is added.</param>
     /// <remarks>
-    /// This method registers a CORS policy named "CorsPolicy" that allows:
-    /// <list type="bullet">
-    /// <item><description>Any origin</description></item>
-    /// <item><description>Any HTTP method</description></item>
-    /// <item><description>Any HTTP header</description></item>
-    /// </list>
-    /// <para>
     /// This is useful for enabling communication between the API and client applications hosted on different domains.
     /// However, it is recommended to restrict origins and headers in production environments for security.
-    /// </para>
     /// </remarks>
-    /// <example>
-    /// Example usage in <c>Program.cs</c>
-    /// <code>
-    /// builder.Services.ConfigureCors();
-    /// app.UseCors("CorsPolicy")
-    /// </code>
-    /// </example>
     public static void ConfigureCors(this IServiceCollection services) =>
         services.AddCors(options =>
         {
@@ -259,5 +245,87 @@ public static class ServiceExtensions
     public static void AddJwtConfiguration(this IServiceCollection services, IConfiguration configuration)
     {
         services.Configure<JwtConfiguration>(configuration.GetSection("JwtSettings"));
+    }
+
+    /// <summary>
+    /// Configures Swagger for the application, including multiple API versions, XML comments for documentation,
+    /// and JWT-based authorization.
+    /// </summary>
+    /// <param name="services">The <see cref="IServiceCollection"/> to add Swagger configuration to.</param>
+    public static void ConfigureSwagger(this IServiceCollection services)
+    {
+        services.AddSwaggerGen(setupAction =>
+        {
+            setupAction.SwaggerDoc("v1", new OpenApiInfo
+            {
+                Title = "WorkforceHub API",
+                Version = "v1",
+                Description = "WorkforceHub API by Workforce",
+                TermsOfService = new Uri("https://example.com/terms"),
+                Contact = new OpenApiContact
+                {
+                    Name = "WorkforceHub",
+                    Email = "workforcehub@email.com",
+                    Url = new Uri("https://example.com/")
+                },
+                License = new OpenApiLicense
+                {
+                    Name = "WorkforceHub API License",
+                    Url = new Uri("https://example.com/license")
+                }
+            });
+
+            setupAction.SwaggerDoc("v2", new OpenApiInfo
+            {
+                Title = "WorkforceHub API",
+                Version = "v2",
+                Description = "An ASP.NET Core Web API for managing Companies and Employees",
+                TermsOfService = new Uri("https://example.com/terms"),
+                Contact = new OpenApiContact
+                {
+                    Name = "WorkforceHub",
+                    Email = "workforcehub@email.com",
+                    Url = new Uri("https://example.com/")
+                },
+                License = new OpenApiLicense
+                {
+                    Name = "WorkforceHub API License",
+                    Url = new Uri("https://example.com/license")
+                }
+            });
+
+            // Includes XML comments for better API documentation using System.Reflection.
+            var xmlFile = $"{typeof(Presentation.AssemblyReference).Assembly.GetName().Name}.xml";
+            var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
+            setupAction.IncludeXmlComments(xmlPath);
+
+            // Configure JWT authorization in Swagger.
+            setupAction.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+            {
+                In = ParameterLocation.Header,
+                Description = "Place to add JWT with Bearer",
+                Name = "Authorization",
+                Type = SecuritySchemeType.ApiKey,
+                Scheme = "Bearer"
+            });
+
+            // Require Bearer authorization for accessing the API endpoints.
+            setupAction.AddSecurityRequirement(new OpenApiSecurityRequirement
+            {
+                {
+                    new OpenApiSecurityScheme
+                    {
+                        Reference = new OpenApiReference
+                        {
+                            Type = ReferenceType.SecurityScheme,
+                            Id = "Bearer"
+                        },
+                        Name = "Bearer"
+                    },
+
+                    new List<string>() // List of required scopes (empty for JWT)
+                }
+            });
+        });
     }
 }

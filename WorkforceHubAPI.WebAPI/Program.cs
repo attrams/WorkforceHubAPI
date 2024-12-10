@@ -85,6 +85,8 @@ builder.Services.ConfigureJWT(builder.Configuration);
 
 builder.Services.AddJwtConfiguration(builder.Configuration);
 
+builder.Services.ConfigureSwagger();
+
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
@@ -114,6 +116,14 @@ app.UseOutputCache();
 app.UseAuthentication();
 
 app.UseAuthorization();
+
+app.UseSwagger();
+
+app.UseSwaggerUI(setupAction =>
+{
+    setupAction.SwaggerEndpoint("/swagger/v1/swagger.json", "WorkforceHub API v1");
+    setupAction.SwaggerEndpoint("/swagger/v2/swagger.json", "WorkforceHub API v2");
+});
 
 app.MapControllers();
 
