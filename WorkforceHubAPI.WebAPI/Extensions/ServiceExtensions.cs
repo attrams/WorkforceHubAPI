@@ -17,6 +17,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using Microsoft.OpenApi.Models;
+using WorkforceHubAPI.WebAPI.Filters;
 
 namespace WorkforceHubAPI.WebAPI.Extensions;
 
@@ -326,6 +327,9 @@ public static class ServiceExtensions
                     new List<string>() // List of required scopes (empty for JWT)
                 }
             });
+
+            // Register custom filter
+            setupAction.OperationFilter<JsonPatchDocumentFilter>();
         });
     }
 }
