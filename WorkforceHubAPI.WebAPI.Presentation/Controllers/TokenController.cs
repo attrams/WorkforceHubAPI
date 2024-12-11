@@ -1,5 +1,7 @@
 using System.Net.Mime;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using WorkforceHubAPI.Entities.ErrorModel;
 using WorkforceHubAPI.Service.Contracts;
 using WorkforceHubAPI.Shared.DataTransferObjects;
 using WorkforceHubAPI.WebAPI.Presentation.ActionFilters;
@@ -31,9 +33,15 @@ public class TokenController : ControllerBase
     /// </summary>
     /// <param name="tokenDto">The data transfer object containing the access token and refresh token.</param>
     /// <returns>An <see cref="IActionResult"/> containing the refreshed token data.</returns>
+    /// <response code="201">Returns the newly created item.</response>
+    /// <response code="400">If the item is null.</response>
+    /// <response code="422">If the model is invalid</response>
     [HttpPost("refresh")]
     [ServiceFilter(typeof(ValidationFilterAttribute))]
     [Consumes(MediaTypeNames.Application.Json)]
+    [ProducesResponseType(typeof(TokenDto), statusCode: StatusCodes.Status201Created, MediaTypeNames.Application.Json)]
+    [ProducesResponseType(typeof(ErrorDetails), StatusCodes.Status400BadRequest, MediaTypeNames.Application.Json)]
+    [ProducesResponseType(typeof(ErrorDetails), StatusCodes.Status422UnprocessableEntity, MediaTypeNames.Application.Json)]
     public async Task<IActionResult> Refresh([FromBody] TokenDto tokenDto)
     {
         var tokenDtoToReturn = await _service.AuthenticationService.RefreshToken(tokenDto);

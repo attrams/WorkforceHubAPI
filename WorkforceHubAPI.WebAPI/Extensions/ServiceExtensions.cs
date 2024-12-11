@@ -330,6 +330,9 @@ public static class ServiceExtensions
 
             // Register custom filter
             setupAction.OperationFilter<JsonPatchDocumentFilter>();
+
+            // Enable XML documentation in Swagger UI.
+            setupAction.EnableAnnotations();
         });
     }
 }

@@ -1,6 +1,8 @@
+using System.Net.Mime;
 using System.Text.Json;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using WorkforceHubAPI.Entities.ErrorModel;
 using WorkforceHubAPI.Service.Contracts;
 using WorkforceHubAPI.Shared.RequestFeatures;
 
@@ -35,7 +37,11 @@ public class CompanyV2Controller : ControllerBase
     /// An <see cref="IActionResult"/> containing the list of companies with "V2" appended to their names, 
     /// along with pagination metadata in the response headers.
     /// </returns>
+    /// <response code="200">Returns the list of companies.</response>
+    /// <response code="400">If the request parameters are invalid.</response>
     [HttpGet]
+    [ProducesResponseType(typeof(IEnumerable<string>), StatusCodes.Status200OK, MediaTypeNames.Application.Json)]
+    [ProducesResponseType(typeof(ErrorDetails), StatusCodes.Status400BadRequest, MediaTypeNames.Application.Json)]
     public async Task<IActionResult> GetCompanies([FromQuery] CompanyParameters companyParameters)
     {
         var (companies, metaData) = await _service.CompanyService.GetAllCompaniesAsync(companyParameters, trackChanges: false);

@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ApiExplorer;
+using WorkforceHubAPI.Entities.ErrorModel;
 using WorkforceHubAPI.Service.Contracts;
 using WorkforceHubAPI.Shared.DataTransferObjects;
 using WorkforceHubAPI.Shared.RequestFeatures;
@@ -42,7 +43,7 @@ public class EmployeeController : ControllerBase
     /// <returns>
     /// A response containing the "Allow" header with the supported HTTP mrthods.
     /// </returns>
-    /// 
+    /// <response code="200">Returns the supported HTTP methods for the Employee controller in the Response header.</response>
     [HttpOptions("/api/companies/employees")]
     public IActionResult GetEmployeeControllerOptions()
     {
@@ -81,8 +82,14 @@ public class EmployeeController : ControllerBase
     /// This method makes an asynchronous call to the service layer to retrieve employee data, and returns the result in an HTTP 200 OK response.
     /// The response includes a collection of employee data, paginated and filtered according to the provided <paramref name="employeeParameters"/>.
     /// </remarks>
+    /// <response code="200">Returns the list of employees with pagination metadata.</response>
+    /// <response code="400">If the request parameters are invalid.</response>
+    /// <response code="404">If the company is not found.</response>
     [HttpGet]
     [HttpHead]
+    [ProducesResponseType(typeof(List<EmployeeDto>), statusCode: StatusCodes.Status200OK, MediaTypeNames.Application.Json)]
+    [ProducesResponseType(typeof(ErrorDetails), StatusCodes.Status400BadRequest, MediaTypeNames.Application.Json)]
+    [ProducesResponseType(typeof(ErrorDetails), StatusCodes.Status404NotFound, MediaTypeNames.Application.Json)]
     public async Task<IActionResult> GetEmployeesForCompany(string companyId, [FromQuery] EmployeeParameters employeeParameters)
     {
         var (employees, metaData) = await _service.EmployeeService.GetEmployeesAsync(companyId, employeeParameters, trackChanges: false);
@@ -97,7 +104,13 @@ public class EmployeeController : ControllerBase
     /// <param name="companyId">The unique identifier of the company.</param>
     /// <param name="employeeId">The unique identifier of the employee.</param>
     /// <returns>An <see cref="IActionResult"/> containing the details of the specified employee.</returns>
+    /// <response code="200">Returns the employee details.</response>
+    /// <response code="400">If the request parameters are invalid.</response>
+    /// <response code="404">If the employee or company is not found.</response>
     [HttpGet("{employeeId}", Name = "GetEmployeeForCompany")]
+    [ProducesResponseType(typeof(EmployeeDto), statusCode: StatusCodes.Status200OK, MediaTypeNames.Application.Json)]
+    [ProducesResponseType(typeof(ErrorDetails), StatusCodes.Status400BadRequest, MediaTypeNames.Application.Json)]
+    [ProducesResponseType(typeof(ErrorDetails), StatusCodes.Status404NotFound, MediaTypeNames.Application.Json)]
     public async Task<IActionResult> GetEmployeeForCompany(string companyId, string employeeId)
     {
         var employee = await _service.EmployeeService.GetEmployeeAsync(companyId, employeeId, trackChanges: false);
@@ -111,9 +124,17 @@ public class EmployeeController : ControllerBase
     /// <param name="companyId">The unique identifier of the company where the employee is being added.</param>
     /// <param name="employee">The data transfer object containing the employee details.</param>
     /// <returns>A response with the created employee data, including a URI to access the newly created employee's details.</returns>
+    /// <response code="201">Returns the newly created employee.</response>
+    /// <response code="400">If the request parameters are invalid.</response>
+    /// <response code="404">If the company is not found.</response>
+    /// <response code="422">If the model is invalid.</response>
     [HttpPost]
     [ServiceFilter(typeof(ValidationFilterAttribute))]
     [Consumes(MediaTypeNames.Application.Json)]
+    [ProducesResponseType(typeof(EmployeeDto), statusCode: StatusCodes.Status201Created, MediaTypeNames.Application.Json)]
+    [ProducesResponseType(typeof(ErrorDetails), StatusCodes.Status400BadRequest, MediaTypeNames.Application.Json)]
+    [ProducesResponseType(typeof(ErrorDetails), StatusCodes.Status404NotFound, MediaTypeNames.Application.Json)]
+    [ProducesResponseType(typeof(ErrorDetails), StatusCodes.Status422UnprocessableEntity, MediaTypeNames.Application.Json)]
     public async Task<IActionResult> CreateEmployeeForCompany(string companyId, [FromBody] EmployeeForCreationDto employee)
     {
         var employeeToReturn = await _service.EmployeeService.CreateEmployeeForCompanyAsync(companyId, employee, trackChanges: false);
@@ -128,7 +149,13 @@ public class EmployeeController : ControllerBase
     /// <param name="companyId">The ID of the company that employee belongs to.</param>
     /// <param name="employeeId">The ID of the employee to delete.</param>
     /// <returns>Returns 204 No Content response if the deletion is successful; otherwise, throws an exception.</returns>
+    /// <response code="204">Indicates that the employee was successfully deleted.</response>
+    /// <response code="400">If the request parameters are invalid.</response>
+    /// <response code="404">If the employee or company is not found.</response>
     [HttpDelete("{employeeId}")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(typeof(ErrorDetails), StatusCodes.Status400BadRequest, MediaTypeNames.Application.Json)]
+    [ProducesResponseType(typeof(ErrorDetails), StatusCodes.Status404NotFound, MediaTypeNames.Application.Json)]
     public async Task<IActionResult> DeleteEmployeeForCompany(string companyId, string employeeId)
     {
         await _service.EmployeeService.DeleteEmployeeForCompanyAsync(companyId, employeeId, trackChanges: false);
@@ -143,9 +170,17 @@ public class EmployeeController : ControllerBase
     /// <param name="employeeId">The unique identifier of the employee to update.</param>
     /// <param name="employee">The data transfer object containing updated employee information.</param>
     /// <returns>Returns a 204 No Content response if the employee is successfully updated.</returns>
+    /// <response code="204">Indicates that the employee was successfully updated.</response>
+    /// <response code="400">If the request parameters are invalid.</response>
+    /// <response code="404">If the employee or company is not found.</response>
+    /// <response code="422">If the model is invalid.</response>
     [HttpPut("{employeeId}")]
     [ServiceFilter(typeof(ValidationFilterAttribute))]
     [Consumes(MediaTypeNames.Application.Json)]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(typeof(ErrorDetails), StatusCodes.Status400BadRequest, MediaTypeNames.Application.Json)]
+    [ProducesResponseType(typeof(ErrorDetails), StatusCodes.Status404NotFound, MediaTypeNames.Application.Json)]
+    [ProducesResponseType(typeof(ErrorDetails), StatusCodes.Status422UnprocessableEntity, MediaTypeNames.Application.Json)]
     public async Task<IActionResult> UpdateEmployeeForCompany(string companyId, string employeeId, [FromBody] EmployeeForUpdateDto employee)
     {
         await _service.EmployeeService.UpdateEmployeeForCompanyAsync(companyId, employeeId, employee, trackCompanyChanges: false, trackEmployeeChanges: true);
@@ -160,8 +195,16 @@ public class EmployeeController : ControllerBase
     /// <param name="employeeId">The ID of the employee to update.</param>
     /// <param name="patchDocument">The JSON Patch document containing the changes.</param>
     /// <returns>A 204 No Content response if the update is successful or a `BadRequest` response if the patch document is null.</returns>
+    /// <response code="204">Indicates that the employee was successfully updated.</response>
+    /// <response code="400">If the request parameters are invalid or the patch document is null.</response>
+    /// <response code="404">If the employee or company is not found.</response>
+    /// <response code="422">If the model is invalid.</response>
     [HttpPatch("{employeeId}")]
     [Consumes(MediaTypeNames.Application.JsonPatch)]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(typeof(ErrorDetails), StatusCodes.Status400BadRequest, MediaTypeNames.Application.Json)]
+    [ProducesResponseType(typeof(ErrorDetails), StatusCodes.Status404NotFound, MediaTypeNames.Application.Json)]
+    [ProducesResponseType(typeof(ErrorDetails), StatusCodes.Status422UnprocessableEntity, MediaTypeNames.Application.Json)]
     public async Task<IActionResult> PartiallyUpdateEmployeeForCompany(string companyId, string employeeId, [FromBody] JsonPatchDocument<EmployeeForUpdateDto> patchDocument)
     {
         if (patchDocument is null)

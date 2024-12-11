@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ApiExplorer;
 using Microsoft.AspNetCore.OutputCaching;
-
+using WorkforceHubAPI.Entities.ErrorModel;
 using WorkforceHubAPI.Service.Contracts;
 using WorkforceHubAPI.Shared.DataTransferObjects;
 using WorkforceHubAPI.Shared.RequestFeatures;
@@ -49,6 +49,7 @@ public class CompanyController : ControllerBase
     /// <returns>
     /// A response containing the "Allow" header with the supported HTTP mrthods.
     /// </returns>
+    /// <response code="200">Returns the supported HTTP methods for the current controller in the response header.</response>
     [HttpOptions]
     public IActionResult GetCompanyControllerOptions()
     {
@@ -88,9 +89,15 @@ public class CompanyController : ControllerBase
     /// in <paramref name="companyParameters"/>. Pagination metadata such as total count, current page, and total pages 
     /// are included in the response.
     /// </remarks>
+    /// <response code="200">Returns the list of companies with pagination metadata.</response>
+    /// <response code="400">If the request parameters are invalid.</response>
+    /// <response code="404">If no companies are found.</response>
     [HttpGet]
     [Authorize(Roles = "Manager")]
     [Produces(MediaTypeNames.Application.Json, MediaTypeNames.Text.Csv, MediaTypeNames.Text.Xml)]
+    [ProducesResponseType(typeof(List<CompanyDto>), statusCode: StatusCodes.Status200OK, MediaTypeNames.Application.Json)]
+    [ProducesResponseType(typeof(ErrorDetails), StatusCodes.Status400BadRequest, MediaTypeNames.Application.Json)]
+    [ProducesResponseType(typeof(ErrorDetails), StatusCodes.Status404NotFound, MediaTypeNames.Application.Json)]
     public async Task<IActionResult> GetCompanies([FromQuery] CompanyParameters companyParameters)
     {
         var (companies, metaData) = await _service.CompanyService.GetAllCompaniesAsync(companyParameters, trackChanges: false);
@@ -105,8 +112,14 @@ public class CompanyController : ControllerBase
     /// </summary>
     /// <param name="id">The unique identifier of the company to retrieve.</param>
     /// <returns>An <see cref="IActionResult"/> containing the company data transfer object (DTO) if found.</returns>
+    /// <response code="200">Returns the company details.</response>
+    /// <response code="400">If the request parameters are invalid.</response>
+    /// <response code="404">If the company is not found.</response>
     [HttpGet("{id}", Name = "CompanyById")]
     [Produces(MediaTypeNames.Application.Json, MediaTypeNames.Text.Csv, MediaTypeNames.Text.Xml)]
+    [ProducesResponseType(typeof(CompanyDto), statusCode: StatusCodes.Status200OK, MediaTypeNames.Application.Json)]
+    [ProducesResponseType(typeof(ErrorDetails), StatusCodes.Status400BadRequest, MediaTypeNames.Application.Json)]
+    [ProducesResponseType(typeof(ErrorDetails), StatusCodes.Status404NotFound, MediaTypeNames.Application.Json)]
     public async Task<IActionResult> GetCompany(string id)
     {
         var company = await _service.CompanyService.GetCompanyAsync(id, trackChanges: false);
@@ -122,8 +135,14 @@ public class CompanyController : ControllerBase
     /// An <see cref="IActionResult"/> containing an HTTP 200 OK response with the collection of companies if the 
     /// retrieval is successful.
     /// </returns>
+    /// <response code="200">Returns the collection of companies.</response>
+    /// <response code="400">If the request parameters are invalid.</response>
+    /// <response code="404">If any company is not found.</response>
     [HttpGet("collection", Name = "CompanyCollection")]
     [Produces(MediaTypeNames.Application.Json, MediaTypeNames.Text.Csv, MediaTypeNames.Text.Xml)]
+    [ProducesResponseType(typeof(List<CompanyDto>), statusCode: StatusCodes.Status200OK, MediaTypeNames.Application.Json)]
+    [ProducesResponseType(typeof(ErrorDetails), StatusCodes.Status400BadRequest, MediaTypeNames.Application.Json)]
+    [ProducesResponseType(typeof(ErrorDetails), StatusCodes.Status404NotFound, MediaTypeNames.Application.Json)]
     public async Task<IActionResult> GetCompanyCollection([ModelBinder(BinderType = typeof(ArrayModelBinder))] IEnumerable<string> companyIds)
     {
         var companies = await _service.CompanyService.GetByIdsAsync(companyIds, trackChanges: false);
@@ -138,9 +157,15 @@ public class CompanyController : ControllerBase
     /// <returns>
     /// A 201 Created response with the location of the newly created company and its details.
     /// </returns>
+    /// <response code="201">Returns the newly created item.</response>
+    /// <response code="400">If the item is null.</response>
+    /// <response code="422">If the model is invalid</response>
     [HttpPost]
     [ServiceFilter(typeof(ValidationFilterAttribute))]
     [Consumes(MediaTypeNames.Application.Json)]
+    [ProducesResponseType(typeof(CompanyDto), statusCode: StatusCodes.Status201Created, MediaTypeNames.Application.Json)]
+    [ProducesResponseType(typeof(ErrorDetails), StatusCodes.Status400BadRequest, MediaTypeNames.Application.Json)]
+    [ProducesResponseType(typeof(ErrorDetails), StatusCodes.Status422UnprocessableEntity, MediaTypeNames.Application.Json)]
     public async Task<IActionResult> CreateCompany([FromBody] CompanyForCreationDto company)
     {
         var createdCompany = await _service.CompanyService.CreateCompanyAsync(company);
@@ -160,8 +185,14 @@ public class CompanyController : ControllerBase
     /// - On success, returns a `201 Created` response containing the newly created companies and their IDs.
     /// - If the provided company collection is null or empty, returns a `400 Bad Request` response.
     /// </returns>
+    /// <response code="201">Returns the a list of the newly created items.</response>
+    /// <response code="400">If an item is null.</response>
+    /// <response code="422">If an item is invalid</response>
     [HttpPost("collection")]
     [Consumes(MediaTypeNames.Application.Json)]
+    [ProducesResponseType(typeof(List<CompanyDto>), statusCode: StatusCodes.Status201Created, MediaTypeNames.Application.Json)]
+    [ProducesResponseType(typeof(ErrorDetails), StatusCodes.Status400BadRequest, MediaTypeNames.Application.Json)]
+    [ProducesResponseType(typeof(ErrorDetails), StatusCodes.Status422UnprocessableEntity, MediaTypeNames.Application.Json)]
     public async Task<IActionResult> CreateCompanyCollection([FromBody] IEnumerable<CompanyForCreationDto> companyCollection)
     {
         var (companies, companyIds) = await _service.CompanyService.CreateCompanyCollectionAsync(companyCollection);
@@ -175,6 +206,12 @@ public class CompanyController : ControllerBase
     /// </summary>
     /// <param name="companyId">The ID of the company to delete.</param>
     /// <returns>A NoContent (204) response if the deletion is successful. </returns>
+    /// <response code="204">Indicates that the company was successfully deleted.</response>
+    /// <response code="400">If the request parameters are invalid.</response>
+    /// <response code="404">If the company is not found.</response>
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(typeof(ErrorDetails), StatusCodes.Status400BadRequest, MediaTypeNames.Application.Json)]
+    [ProducesResponseType(typeof(ErrorDetails), StatusCodes.Status404NotFound, MediaTypeNames.Application.Json)]
     [HttpDelete("{companyId}")]
     public async Task<IActionResult> DeleteCompany(string companyId)
     {
@@ -191,9 +228,15 @@ public class CompanyController : ControllerBase
     /// An object containing the updated details of the company, including optional updates to associated employees.
     /// </param>
     /// <returns>Returns a <see cref="NoContentResult"/> if the update operation is successful.</returns>
+    /// <response code="204">Empty Response</response>
+    /// <response code="400">If the item is null.</response>
+    /// <response code="422">If the model is invalid.</response>
     [HttpPut("{companyId}")]
     [ServiceFilter(typeof(ValidationFilterAttribute))]
     [Consumes(MediaTypeNames.Application.Json)]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(typeof(ErrorDetails), StatusCodes.Status400BadRequest, MediaTypeNames.Application.Json)]
+    [ProducesResponseType(typeof(ErrorDetails), StatusCodes.Status422UnprocessableEntity, MediaTypeNames.Application.Json)]
     public async Task<IActionResult> UpdateCompany(string companyId, [FromBody] CompanyForUpdateDto company)
     {
         await _service.CompanyService.UpdateCompanyAsync(companyId, company, trackChanges: true);

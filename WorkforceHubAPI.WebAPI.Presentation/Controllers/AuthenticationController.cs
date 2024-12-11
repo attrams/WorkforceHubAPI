@@ -39,9 +39,15 @@ public class AuthenticationController : ControllerBase
     /// <para> - Returns <see cref="BadRequest"/> with validation errors if registration fails.</para>
     /// <para> - Returns a 201 status code if the user is successfully registered.</para>
     /// </returns>
+    /// <response code="201">Indicates that the user was successfully registered.</response>
+    /// <response code="400">If the user registration data is null.</response>
+    /// <response code="422">If the user registration data is invalid.</response>
     [HttpPost]
     [ServiceFilter(typeof(ValidationFilterAttribute))]
     [Consumes(MediaTypeNames.Application.Json)]
+    [ProducesResponseType(StatusCodes.Status201Created)]
+    [ProducesResponseType(typeof(ErrorDetails), StatusCodes.Status400BadRequest, MediaTypeNames.Application.Json)]
+    [ProducesResponseType(typeof(ErrorDetails), StatusCodes.Status422UnprocessableEntity, MediaTypeNames.Application.Json)]
     public async Task<IActionResult> RegisterUser([FromBody] UserForRegistrationDto userForRegistration)
     {
         var result = await _service.AuthenticationService.RegisterUser(userForRegistration);
@@ -68,9 +74,17 @@ public class AuthenticationController : ControllerBase
     ///     <para> - Returns <see cref="UnauthorizedObjectResult"/> if the user validation fails.</para>
     ///     <para> - Returns <see cref="OkObjectResult"/> with a generated access and refresh tokens if authentication is successful.</para>
     /// </returns>
+    /// <response code="200">Returns the generated token for the authenticated user.</response>
+    /// <response code="400">If the authentication data is null.</response>
+    /// <response code="401">If the authentication fails.</response>
+    /// <response code="422">If an authentication data is invalid.</response>
     [HttpPost("login")]
     [ServiceFilter(typeof(ValidationFilterAttribute))]
     [Consumes(MediaTypeNames.Application.Json)]
+    [ProducesResponseType(typeof(TokenDto), StatusCodes.Status200OK, MediaTypeNames.Application.Json)]
+    [ProducesResponseType(typeof(ErrorDetails), StatusCodes.Status400BadRequest, MediaTypeNames.Application.Json)]
+    [ProducesResponseType(typeof(ErrorDetails), StatusCodes.Status401Unauthorized, MediaTypeNames.Application.Json)]
+    [ProducesResponseType(typeof(ErrorDetails), StatusCodes.Status422UnprocessableEntity, MediaTypeNames.Application.Json)]
     public async Task<IActionResult> Authenticate([FromBody] UserForAuthenticationDto user)
     {
         if (!await _service.AuthenticationService.ValidateUser(user))
