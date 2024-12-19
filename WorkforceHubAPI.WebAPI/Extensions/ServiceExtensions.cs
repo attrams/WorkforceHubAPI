@@ -80,10 +80,8 @@ public static class ServiceExtensions
         }
         else
         {
-            services.AddDbContext<RepositoryContext>(options => options.UseSqlServer(configuration.GetConnectionString("AZURE_SQL_CONNECTIONSTRING")));
+            services.AddDbContext<RepositoryContext>(options => options.UseAzureSql(configuration["azure-sql-connectionstring-3d8e1"]));
         }
-
-
     }
 
 
