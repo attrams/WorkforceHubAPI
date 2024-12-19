@@ -1,3 +1,4 @@
+using Azure.Identity;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Mvc;
 using Serilog;
@@ -33,7 +34,7 @@ builder.Services.ConfigureCors();
 
 builder.Services.ConfigureLoggerService();
 
-builder.Services.ConfigureSqlContext(builder.Configuration);
+builder.Services.ConfigureSqlContext(builder.Configuration, builder.Environment);
 
 builder.Services.ConfigureRepositoryManager();
 
@@ -80,6 +81,16 @@ builder.Services.ConfigureRateLimitingOptions();
 builder.Services.AddAuthentication();
 
 builder.Services.ConfigureIdentity();
+
+if (builder.Environment.IsDevelopment())
+{
+    builder.Configuration.AddUserSecrets<Program>();
+}
+var keyVaultUri = builder.Configuration["AZURE_KEYVAULT_RESOURCEENDPOINT"];
+if (!string.IsNullOrEmpty(keyVaultUri))
+{
+    builder.Configuration.AddAzureKeyVault(new Uri(keyVaultUri), new DefaultAzureCredential());
+}
 
 builder.Services.ConfigureJWT(builder.Configuration);
 

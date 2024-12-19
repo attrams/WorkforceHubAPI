@@ -72,13 +72,19 @@ public static class ServiceExtensions
     /// </summary>
     /// <param name="services">The service collection to which the database context will be added.</param>
     /// <param name="configuration">The application configuration for accessing the database connection string.</param>
-    public static void ConfigureSqlContext(
-        this IServiceCollection services,
-        IConfiguration configuration
-    ) =>
-        services.AddDbContext<RepositoryContext>(options =>
-            options.UseSqlServer(configuration.GetConnectionString("DefaultConnection"))
-        );
+    public static void ConfigureSqlContext(this IServiceCollection services, IConfiguration configuration, IWebHostEnvironment environment)
+    {
+        if (environment.IsDevelopment())
+        {
+            services.AddDbContext<RepositoryContext>(options => options.UseSqlServer(configuration.GetConnectionString("DefaultConnection")));
+        }
+        else
+        {
+            services.AddDbContext<RepositoryContext>(options => options.UseSqlServer(configuration.GetConnectionString("AZURE_SQL_CONNECTIONSTRING")));
+        }
+
+    }
+
 
     /// <summary>
     /// Configures the custom CSV output formatter by adding it to the MVC pipeline.
