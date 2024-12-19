@@ -9,6 +9,17 @@ using WorkforceHubAPI.WebAPI.Presentation.ActionFilters;
 
 var builder = WebApplication.CreateBuilder(args);
 
+if (builder.Environment.IsDevelopment())
+{
+    builder.Configuration.AddUserSecrets<Program>();
+}
+
+var keyVaultUri = builder.Configuration["AZURE_KEYVAULT_RESOURCEENDPOINT"];
+if (!string.IsNullOrEmpty(keyVaultUri))
+{
+    builder.Configuration.AddAzureKeyVault(new Uri(keyVaultUri), new DefaultAzureCredential());
+}
+
 builder.Logging.ClearProviders().AddSimpleConsole().AddDebug();
 
 // Add services to the container.
@@ -82,19 +93,9 @@ builder.Services.AddAuthentication();
 
 builder.Services.ConfigureIdentity();
 
-if (builder.Environment.IsDevelopment())
-{
-    builder.Configuration.AddUserSecrets<Program>();
-}
-var keyVaultUri = builder.Configuration["AZURE_KEYVAULT_RESOURCEENDPOINT"];
-if (!string.IsNullOrEmpty(keyVaultUri))
-{
-    builder.Configuration.AddAzureKeyVault(new Uri(keyVaultUri), new DefaultAzureCredential());
-}
+builder.Services.AddJwtConfiguration(builder.Configuration);
 
 builder.Services.ConfigureJWT(builder.Configuration);
-
-builder.Services.AddJwtConfiguration(builder.Configuration);
 
 builder.Services.ConfigureSwagger();
 
